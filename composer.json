@@ -1,0 +1,12 @@
+{
+    "name": "computator/framework-utils",
+    "description": "Various utilities to simplify writing a site or API",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Computator\\FrameworkUtils\\": "src/"
+        }
+    },
+    "require": {}
+}
