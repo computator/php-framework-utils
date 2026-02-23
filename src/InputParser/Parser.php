@@ -2,6 +2,7 @@
 
 namespace Computator\FrameworkUtils\InputParser;
 
+use Exception;
 use function array_key_exists, is_int, is_string;
 
 class Parser {
@@ -33,6 +34,8 @@ class Parser {
 	protected function _get(string $field): mixed {
 		if (!array_key_exists($field, $this->valid_fields))
 			throw new \OutOfRangeException("field '{$field}' is not defined");
+		// TODO: cache result
+		// TODO: store original?
 		return $this->parseField(
 			$this->input[$field] ?? null,
 			$this->valid_fields[$field] ?? $this->parse_opts,
@@ -57,5 +60,20 @@ class Parser {
 			throw new \ValueError("invalid field: empty after filtering");
 
 		return $value;
+	}
+
+	public function evalAll(): array {
+		$out = [];
+		$errs = [];
+		foreach (array_keys($this->valid_fields) as $f) {
+			try {
+				$out[$f] = $this->get($f);
+			}
+			catch (Exception $e) {
+				$out[$f] = null;
+				$errs[$f] = $e;
+			}
+		}
+		return [$out, $errs];
 	}
 }
