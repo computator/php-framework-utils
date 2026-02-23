@@ -45,7 +45,8 @@ class ParserConfig {
 		$n->update(...(array_diff_key($opts, array_flip(self::LIST_FIELDS))));
 		if ($lfields = array_intersect_key($opts, array_flip(self::LIST_FIELDS))) {
 			foreach ($lfields as $k => $v)
-				$lfields[$k] = [...$lfields[$k], ...$v];
+				// merge iterables and pass on non-iterables to let update throw error
+				$lfields[$k] = is_iterable($v) ? [...$n->{$k}, ...$v] : $v;
 			$n->update(...$lfields);
 		}
 		return $n;
