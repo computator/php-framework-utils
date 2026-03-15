@@ -18,53 +18,53 @@ final class ParserTest extends TestCase {
 	public static function parsingProvider(): iterable {
 		foreach ([
 			'empty' => [
-				'defs' => [],
+				'field_defs' => [],
 				'subtests' => [
 					'none' => [
-						[],
-						[],
-						[],
+						'input'      => [],
+						'exp_parsed' => [],
+						'exp_errors' => [],
 					],
 					'extra keys' => [
-						['test' => 'asdf', 'qwer' => 3],
-						[],
-						[],
+						'input'      => ['test' => 'asdf', 'qwer' => 3],
+						'exp_parsed' => [],
+						'exp_errors' => [],
 					],
 					'extra numeric keys' => [
-						['asdf', 3],
-						[],
-						[],
+						'input'      => ['asdf', 3],
+						'exp_parsed' => [],
+						'exp_errors' => [],
 					],
 				],
 			],
 			'string param' => [
-				'defs' => [
+				'field_defs' => [
 					'test',
 				],
 				'subtests' => [
 					'none' => [
-						[],
-						['test' => null],
-						[],
+						'input'      => [],
+						'exp_parsed' => ['test' => null],
+						'exp_errors' => [],
 					],
 					'empty string' => [
-						['test' => ''],
-						['test' => ''],
-						[],
+						'input'      => ['test' => ''],
+						'exp_parsed' => ['test' => ''],
+						'exp_errors' => [],
 					],
 					'string value' => [
-						['test' => 'asdf'],
-						['test' => 'asdf'],
-						[],
+						'input'      => ['test' => 'asdf'],
+						'exp_parsed' => ['test' => 'asdf'],
+						'exp_errors' => [],
 					],
 					'extra keys' => [
-						['test' => 'asdf', 'qwer' => 3, 'zxcv', 3],
-						['test' => 'asdf'],
-						[],
+						'input'      => ['test' => 'asdf', 'qwer' => 3, 'zxcv', 3],
+						'exp_parsed' => ['test' => 'asdf'],
+						'exp_errors' => [],
 					],
 				],
 			],
-		] as $test_name => ['defs' => $defs, 'subtests' => $subtests])
+		] as $test_name => ['field_defs' => $defs, 'subtests' => $subtests])
 			foreach ($subtests as $subname => $subargs)
 				yield "\"{$test_name}\" with input \"{$subname}\"" => [$defs, ...$subargs];
 	}
