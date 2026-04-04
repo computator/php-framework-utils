@@ -23,8 +23,8 @@ class Parser {
 		}
 	}
 
-	public function defineField(string $field, ?ParserConfig $field_opts = null): void {
-		$this->valid_fields[$field] = $field_opts;
+	public function defineField(string $field, ?Field\Base $field_def = null): void {
+		$this->valid_fields[$field] = $field_def ?? new $this->parse_opts->default_field_type;
 	}
 
 	public function get(string $field): mixed {
@@ -38,28 +38,30 @@ class Parser {
 		// TODO: store original?
 		return $this->parseField(
 			$this->input[$field] ?? null,
-			$this->valid_fields[$field] ?? $this->parse_opts,
+			$this->valid_fields[$field],
 		);
 	}
 
-	protected function parseField(mixed $value, ParserConfig $opts): mixed {
+	protected function parseField(mixed $value, Field\Base $field): mixed {
 		// basic checks
 		if ($value === null)
 			return null;
-		if (!is_string($value))
-			return $value;
-		if ($opts->unset_empty && $value === '')
-			return null;
+		if (is_string($value)) {
+			if ($this->parse_opts->unset_empty && $value === '')
+				return null;
+		}
 
 		// processing
-		foreach ($opts->filters as $filt)
+		foreach ($this->parse_opts->filters as $filt)
 			$value = $filt($value);
 
 		// validation
-		if ($opts->invalid_empty && $value === '')
-			throw new \ValueError("invalid field: empty after filtering");
+		if (is_string($value)) {
+			if ($this->parse_opts->invalid_empty && $value === '')
+				throw new \ValueError("invalid field: empty after filtering");
+		}
 
-		return $value;
+		return $field->parse($value);
 	}
 
 	public function evalAll(): array {

@@ -23,6 +23,7 @@ class ParserConfig {
 
 	public bool $unset_empty = false;
 	public bool $invalid_empty = false;
+	public string $default_field_type = Field\StringField::class;
 
 	protected const LIST_FIELDS = ['filters'];
 	public array $filters = [];
@@ -32,6 +33,7 @@ class ParserConfig {
 	protected function update(
 		?bool $unset_empty = null,
 		?bool $invalid_empty = null,
+		?string $default_field_type = null,
 		?array $filters = null,
 	): void {
 		foreach (get_defined_vars() as $k => $v) {

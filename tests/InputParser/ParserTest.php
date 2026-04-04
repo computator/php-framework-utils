@@ -1,6 +1,8 @@
 <?php declare(strict_types=1);
 
+use Computator\FrameworkUtils\InputParser\Field;
 use Computator\FrameworkUtils\InputParser\Parser;
+use Computator\FrameworkUtils\InputParser\ParserConfig;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
@@ -37,7 +39,7 @@ final class ParserTest extends TestCase {
 					],
 				],
 			],
-			'string param' => [
+			'base' => [
 				'field_defs' => [
 					'test',
 				],
@@ -64,8 +66,35 @@ final class ParserTest extends TestCase {
 					],
 				],
 			],
+			'string field' => [
+				'field_defs' => [
+					'test' => Field::String(),
+				],
+				'subtests' => [
+					'none' => [
+						'input'      => [],
+						'exp_parsed' => ['test' => null],
+						'exp_errors' => [],
+					],
+					'empty' => [
+						'input'      => ['test' => ''],
+						'exp_parsed' => ['test' => null],
+						'exp_errors' => [],
+					],
+					'whitespace only' => [
+						'input'      => ['test' => '        '],
+						'exp_parsed' => ['test' => '        '],
+						'exp_errors' => [],
+					],
+					'extra whitespace' => [
+						'input'      => ['test' => '  asdf      '],
+						'exp_parsed' => ['test' => '  asdf      '],
+						'exp_errors' => [],
+					],
+				],
+			],
 		] as $test_name => ['field_defs' => $defs, 'subtests' => $subtests])
-			foreach ($subtests as $subname => $subargs)
+			foreach ($subtests ?? [[]] as $subname => $subargs)
 				yield "\"{$test_name}\" with input \"{$subname}\"" => [$defs, ...$subargs];
 	}
 }
