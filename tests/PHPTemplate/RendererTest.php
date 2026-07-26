@@ -14,8 +14,9 @@ final class RendererTest extends TestCase {
 
 	public function testBasicFileTemplateRender(): void {
 		$fd = tmpfile();
-		fwrite($fd, 'asdf');
 		['uri' => $path] = stream_get_meta_data($fd);
+
+		fwrite($fd, 'asdf');
 
 		$r = new Renderer(new FileTemplate($path));
 		$this->expectOutputString('asdf');
