@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 
 use Computator\FrameworkUtils\PHPTemplate\Renderer;
+use Computator\FrameworkUtils\PHPTemplate\TemplateRuntimeController;
 use Computator\FrameworkUtils\PHPTemplate\TextTemplate;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -34,8 +35,7 @@ final class TextTemplateTest extends TestCase {
 		$this->expectOutputString("before\nasdf");
 		$rv = $t->execute(
 			['var' => 'asdf'],
-			renderer: $this->createStub(Renderer::class),
-			tpl: $t,
+			...TemplateRuntimeController::getConstructorTestArgs($this),
 		);
 		$this->assertEquals(42, $rv);
 	}

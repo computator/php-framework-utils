@@ -2,6 +2,7 @@
 
 use Computator\FrameworkUtils\PHPTemplate\FileTemplate;
 use Computator\FrameworkUtils\PHPTemplate\Renderer;
+use Computator\FrameworkUtils\PHPTemplate\TemplateRuntimeController;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -46,8 +47,7 @@ final class FileTemplateTest extends TestCase {
 		$this->expectOutputString("before\nasdf");
 		$rv = $t->execute(
 			['var' => 'asdf'],
-			renderer: $this->createStub(Renderer::class),
-			tpl: $t,
+			...TemplateRuntimeController::getConstructorTestArgs($this),
 		);
 		$this->assertEquals(42, $rv);
 
