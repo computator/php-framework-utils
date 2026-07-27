@@ -4,6 +4,8 @@ namespace Computator\FrameworkUtils\PHPTemplate;
 
 class TemplateRuntimeController {
 
+	use ExecInClass;
+
 	public static function getConstructorTestArgs(\PHPUnit\Framework\TestCase $tc): array {
 		return (fn () => [
 			'renderer' => $this->createStub(Renderer::class),

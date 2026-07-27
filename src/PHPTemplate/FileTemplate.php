@@ -21,9 +21,11 @@ class FileTemplate extends TemplateBase {
 	}
 
 	public function execute(array $context, mixed ...$controller_args): mixed {
-		return TemplateBase::run_in_controller_exec(function () {
-			extract($this->__context);
-			return include $this->__func_data['path'];
-		}, ['path' => $this->path], $context, ...$controller_args);
+		$rc = new TemplateRuntimeController(...$controller_args);
+		return $rc->__execInClass(function () {
+			extract($this->__exec_data['context']);
+			unset($this->__exec_data['context']);
+			return include $this->__exec_data['path'];
+		}, ['context' => $context, 'path' => $this->path]);
 	}
 }

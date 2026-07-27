@@ -14,10 +14,12 @@ class TextTemplate extends TemplateBase {
 	}
 
 	public function execute(array $context, mixed ...$controller_args): mixed {
-		return TemplateBase::run_in_controller_exec(function () {
-			extract($this->__context);
+		$rc = new TemplateRuntimeController(...$controller_args);
+		return $rc->__execInClass(function () {
+			extract($this->__exec_data['context']);
+			unset($this->__exec_data['context']);
 			// ending tag added to switch to HTML mode instead of starting in PHP mode
-			return eval("?>{$this->__func_data['content']}");
-		}, ['content' => $this->content], $context, ...$controller_args);
+			return eval("?>{$this->__exec_data['content']}");
+		}, ['context' => $context, 'content' => $this->content]);
 	}
 }
