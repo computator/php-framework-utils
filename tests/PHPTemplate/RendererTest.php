@@ -24,4 +24,10 @@ final class RendererTest extends TestCase {
 
 		fclose($fd);
 	}
+
+	public function testRenderToString(): void {
+		$r = new Renderer(new TextTemplate('asdf'));
+		$out = $r->renderToString();
+		$this->assertEquals('asdf', $out);
+	}
 }

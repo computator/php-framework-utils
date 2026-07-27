@@ -1,10 +1,8 @@
 <?php declare(strict_types=1);
 
 use Computator\FrameworkUtils\PHPTemplate\FileTemplate;
-use Computator\FrameworkUtils\PHPTemplate\Renderer;
 use Computator\FrameworkUtils\PHPTemplate\TemplateBase;
 use Computator\FrameworkUtils\PHPTemplate\TemplateResolver;
-use Computator\FrameworkUtils\PHPTemplate\TextTemplate;
 use PHPUnit\Framework\TestCase;
 
 final class TemplateResolverTest extends TestCase {
