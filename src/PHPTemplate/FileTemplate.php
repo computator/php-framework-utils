@@ -22,10 +22,13 @@ class FileTemplate extends TemplateBase {
 
 	public function execute(array $context, mixed ...$controller_args): mixed {
 		$rc = new TemplateRuntimeController(...$controller_args);
-		return $rc->__execInClass(function () {
-			extract($this->__exec_data['context']);
-			unset($this->__exec_data['context']);
-			return include $this->__exec_data['path'];
-		}, ['context' => $context, 'path' => $this->path]);
+		return $rc->__execInClass(
+			function () {
+				extract($this->__exec_data['context']);
+				unset($this->__exec_data['context']);
+				return include $this->__exec_data['path'];
+			},
+			['context' => $context, 'path' => $this->path],
+		);
 	}
 }
