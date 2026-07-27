@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 
 use Computator\FrameworkUtils\PHPTemplate\FileTemplate;
+use Computator\FrameworkUtils\PHPTemplate\Renderer;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -43,7 +44,11 @@ final class FileTemplateTest extends TestCase {
 
 		$t = new FileTemplate($path);
 		$this->expectOutputString("before\nasdf");
-		$rv = $t->execute(var: 'asdf');
+		$rv = $t->execute(
+			['var' => 'asdf'],
+			renderer: $this->createStub(Renderer::class),
+			tpl: $t,
+		);
 		$this->assertEquals(42, $rv);
 
 		fclose($fd);

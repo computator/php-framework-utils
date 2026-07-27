@@ -25,6 +25,10 @@ class Renderer {
 	}
 
 	protected function do_render(): void {
-		$this->root_template->execute([]);
+		$this->root_template->execute(
+			[],
+			renderer: $this,
+			tpl: $this->root_template,
+		);
 	}
 }
