@@ -14,24 +14,10 @@ class TextTemplate extends TemplateBase {
 	}
 
 	public function execute(array $context, mixed ...$controller_args): mixed {
-		return (new class ($context, $this->content, ...$controller_args) extends TemplateRuntimeController {
-			private readonly bool $__run;
-			final public function __construct(
-				private array $__context,
-				private readonly string $__tpl,
-				mixed ...$controller_args,
-			) {
-				parent::__construct(...$controller_args);
-			}
-
-			final public function __exec(): mixed {
-				if (isset($this->__run))
-					throw new \LogicException("'" . __METHOD__ . "' is internal only");
-				$this->__run = true;
-				extract($this->__context);
-				// ending tag added to switch to HTML mode instead of starting in PHP mode
-				return eval("?>{$this->__tpl}");
-			}
-		})->__exec();
+		return TemplateBase::run_in_controller_exec(function () {
+			extract($this->__context);
+			// ending tag added to switch to HTML mode instead of starting in PHP mode
+			return eval("?>{$this->__func_data['content']}");
+		}, ['content' => $this->content], $context, ...$controller_args);
 	}
 }
