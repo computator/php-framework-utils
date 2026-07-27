@@ -14,13 +14,17 @@ class TemplateResolver {
 			throw new TypeError("'\$new_template_class' must be an instance of TemplateBase");
 	}
 
-	public function resolve(string $template): ?TemplateBase {
+	final public function resolve(string $template): ?TemplateBase {
 		if ($template == '')
 			throw new ValueError("'\$template' can not be empty");
 		try {
-			return new $this->new_template_class($template);
+			return $this->map($template);
 		} catch (Exception) {
 			return null;
 		}
+	}
+
+	protected function map(string $template): TemplateBase {
+		return new $this->new_template_class($template);
 	}
 }
