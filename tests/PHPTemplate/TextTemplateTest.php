@@ -39,4 +39,17 @@ final class TextTemplateTest extends TestCase {
 		);
 		$this->assertEquals(42, $rv);
 	}
+
+	public function testVerifyUsesRootNamespace(): void {
+		$t = new TextTemplate(<<<'TPL'
+			<?php
+			return __NAMESPACE__;
+			TPL
+		);
+		$rv = $t->execute(
+			[],
+			...TemplateRuntimeController::getConstructorTestArgs($this),
+		);
+		$this->assertEquals('', $rv);
+	}
 }

@@ -53,4 +53,24 @@ final class FileTemplateTest extends TestCase {
 
 		fclose($fd);
 	}
+
+	public function testVerifyUsesRootNamespace(): void {
+		$fd = tmpfile();
+		['uri' => $path] = stream_get_meta_data($fd);
+
+		fwrite($fd, <<<'TPL'
+			<?php
+			return __NAMESPACE__;
+			TPL
+		);
+
+		$t = new FileTemplate($path);
+		$rv = $t->execute(
+			[],
+			...TemplateRuntimeController::getConstructorTestArgs($this),
+		);
+		$this->assertEquals('', $rv);
+
+		fclose($fd);
+	}
 }
