@@ -4,10 +4,12 @@ namespace Computator\FrameworkUtils\PHPTemplate;
 
 class Renderer {
 	protected readonly TemplateBase $root_template;
+	protected readonly TemplateResolver $resolver;
 	protected bool $rendering_to_string;
 
-	public function __construct(TemplateBase $template) {
+	public function __construct(TemplateBase $template, TemplateResolver $resolver = new TemplateResolver()) {
 		$this->root_template = $template;
+		$this->resolver = $resolver;
 	}
 
 	public function render(): void {
