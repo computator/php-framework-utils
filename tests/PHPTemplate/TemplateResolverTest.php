@@ -1,5 +1,6 @@
 <?php declare(strict_types=1);
 
+use Computator\FrameworkUtils\PHPTemplate\Exceptions;
 use Computator\FrameworkUtils\PHPTemplate\FileTemplate;
 use Computator\FrameworkUtils\PHPTemplate\TemplateBase;
 use Computator\FrameworkUtils\PHPTemplate\TemplateResolver;
@@ -26,7 +27,7 @@ final class TemplateResolverTest extends TestCase {
 		$this->assertInstanceOf($tc_success::class, $resolved);
 	}
 
-	public function testTemplateNotFoundReturnsNull(): void {
+	public function testTemplateNotFoundThrows(): void {
 		$tc_fail = new class extends TemplateBase {
 			public function __construct() {
 				static $first = true;
@@ -35,7 +36,7 @@ final class TemplateResolverTest extends TestCase {
 					$first = false;
 					return;
 				}
-				throw new Exception("Not found");
+				throw new Exceptions\TemplateNotFoundException("Not found");
 			}
 			public function execute(mixed ...$__context): mixed {
 				return null;
@@ -44,14 +45,14 @@ final class TemplateResolverTest extends TestCase {
 				return "";
 			}
 		};
-		$resolved = (new TemplateResolver($tc_fail::class))->resolve('asdf');
-		$this->assertNull($resolved);
+		$this->expectException(Exceptions\TemplateNotFoundException::class);
+		(new TemplateResolver($tc_fail::class))->resolve('asdf');
 	}
 
 	public function testEmptyTemplateNameThrows(): void {
 		$r = new TemplateResolver();
 		$this->expectException(ValueError::class);
-		$t = $r->resolve('');
+		$r->resolve('');
 	}
 
 	public function testDefaultResolver(): void {

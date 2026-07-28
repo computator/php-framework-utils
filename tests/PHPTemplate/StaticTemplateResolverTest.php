@@ -1,5 +1,6 @@
 <?php declare(strict_types=1);
 
+use Computator\FrameworkUtils\PHPTemplate\Exceptions;
 use Computator\FrameworkUtils\PHPTemplate\StaticTemplateResolver;
 use Computator\FrameworkUtils\PHPTemplate\TemplateBase;
 use Computator\FrameworkUtils\PHPTemplate\TextTemplate;
@@ -26,7 +27,7 @@ final class StaticTemplateResolverTest extends TestCase {
 			],
 			$tc_success::class,
 		))->resolve('asdf');
-		$this->assertNotNull($resolved);
+		$this->assertInstanceOf(TemplateBase::class, $resolved);
 		$this->assertEquals('one', $resolved->value);
 	}
 
@@ -43,14 +44,14 @@ final class StaticTemplateResolverTest extends TestCase {
 			}
 		};
 
-		$resolved = (new StaticTemplateResolver(
+		$this->expectException(Exceptions\TemplateNotFoundException::class);
+		(new StaticTemplateResolver(
 			[
 				'asdf' => 'one',
 				'qwer' => 'two',
 			],
 			$tc_success::class,
 		))->resolve('invalid');
-		$this->assertNull($resolved);
 	}
 
 	public function testDefaultTemplateClass(): void {
@@ -58,7 +59,6 @@ final class StaticTemplateResolverTest extends TestCase {
 			'asdf' => 'one',
 			'qwer' => 'two',
 		]))->resolve('asdf');
-		$this->assertNotNull($resolved);
 		$this->assertInstanceOf(TextTemplate::class, $resolved);
 		$this->assertEquals('one', $resolved->content);
 	}

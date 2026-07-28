@@ -2,11 +2,6 @@
 
 namespace Computator\FrameworkUtils\PHPTemplate;
 
-use Exception;
-use RuntimeException;
-use TypeError;
-use ValueError;
-
 use function array_key_exists;
 
 class StaticTemplateResolver extends TemplateResolver {
@@ -19,7 +14,7 @@ class StaticTemplateResolver extends TemplateResolver {
 
 	protected function map(string $template): TemplateBase {
 		if (!array_key_exists($template, $this->templates))
-			throw new RuntimeException("template not found");
+			throw new Exceptions\TemplateNotFoundException("template '{$template}' not found");
 		return new $this->new_template_class($this->templates[$template]);
 	}
 }

@@ -1,6 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Computator\FrameworkUtils\PHPTemplate;
+namespace Computator\FrameworkUtils\PHPTemplate\RenderObjects;
+
+use Computator\FrameworkUtils\PHPTemplate\Renderer;
+use Computator\FrameworkUtils\PHPTemplate\TemplateBase;
 
 class TemplateRenderProxy {
 	protected static int $next_id = 1;

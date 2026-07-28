@@ -2,6 +2,8 @@
 
 namespace Computator\FrameworkUtils\PHPTemplate;
 
+use function is_string;
+
 class Renderer {
 	protected readonly TemplateBase $root_template;
 	protected readonly TemplateResolver $resolver;
@@ -33,11 +35,9 @@ class Renderer {
 		);
 	}
 
-	public function getTemplateAsProxy(string $template): ?TemplateRenderProxy {
+	public function getTemplateAsProxy(string $template): RenderObjects\TemplateRenderProxy {
 		$tpl = $this->resolver->resolve($template);
-		if ($tpl == null)
-			return null;
-		$proxy = new TemplateRenderProxy(
+		$proxy = new RenderObjects\TemplateRenderProxy(
 			$this,
 			$tpl,
 		);
@@ -45,7 +45,13 @@ class Renderer {
 		return $proxy;
 	}
 
-	public function renderChild(TemplateRenderProxy $proxy): void {
+	public function renderChild(RenderObjects\TemplateRenderProxy $proxy): void {
 		$this->do_render($this->tpl_proxy_map[$proxy->id]);
+	}
+
+	public function renderError(TextTemplate|StringTemplate|string $error): void {
+		if (is_string($error))
+			$error = new StringTemplate($error);
+		$this->do_render($error);
 	}
 }

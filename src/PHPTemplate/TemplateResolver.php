@@ -2,7 +2,6 @@
 
 namespace Computator\FrameworkUtils\PHPTemplate;
 
-use Exception;
 use TypeError;
 use ValueError;
 
@@ -14,14 +13,10 @@ class TemplateResolver {
 			throw new TypeError("'\$new_template_class' must be an instance of TemplateBase");
 	}
 
-	final public function resolve(string $template): ?TemplateBase {
+	final public function resolve(string $template): TemplateBase {
 		if ($template == '')
 			throw new ValueError("'\$template' can not be empty");
-		try {
-			return $this->map($template);
-		} catch (Exception) {
-			return null;
-		}
+		return $this->map($template);
 	}
 
 	protected function map(string $template): TemplateBase {

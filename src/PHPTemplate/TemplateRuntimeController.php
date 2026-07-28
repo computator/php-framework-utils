@@ -17,7 +17,11 @@ class TemplateRuntimeController {
 		protected readonly TemplateBase $template,
 	) {}
 
-	public function tpl(string $template): ?TemplateRenderProxy {
-		return $this->renderer->getTemplateAsProxy($template);
+	public function tpl(string $template): RenderObjects\TemplateRenderProxy|RenderObjects\Error {
+		try {
+			return $this->renderer->getTemplateAsProxy($template);
+		} catch (Exceptions\TemplateNotFoundException $e) {
+			return new RenderObjects\Error($this->renderer, $e);
+		}
 	}
 }
