@@ -3,9 +3,11 @@
 use Computator\FrameworkUtils\PHPTemplate\FileTemplate;
 use Computator\FrameworkUtils\PHPTemplate\Renderer;
 use Computator\FrameworkUtils\PHPTemplate\TemplateRuntimeController;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(FileTemplate::class)]
 final class FileTemplateTest extends TestCase {
 	#[DataProvider('getContentsProvider')]
 	public function testGetContents(string $tpl, array $args, string $exp): void {

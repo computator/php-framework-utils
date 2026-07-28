@@ -1,9 +1,11 @@
 <?php declare(strict_types=1);
 
 use Computator\FrameworkUtils\InputParser\ParserConfig;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(ParserConfig::class)]
 final class ParserConfigTest extends TestCase {
 	#[DoesNotPerformAssertions]
 	public function testConstructorAcceptsAllProperties(): void {

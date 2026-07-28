@@ -3,10 +3,12 @@
 use Computator\FrameworkUtils\InputParser\Field;
 use Computator\FrameworkUtils\InputParser\Parser;
 use Computator\FrameworkUtils\InputParser\ParserConfig;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Parser::class)]
 final class ParserTest extends TestCase {
 	#[DataProvider('parsingProvider')]
 	#[TestDox('Parsing field defs $_dataName')]

@@ -3,9 +3,11 @@
 use Computator\FrameworkUtils\PHPTemplate\Renderer;
 use Computator\FrameworkUtils\PHPTemplate\TemplateRuntimeController;
 use Computator\FrameworkUtils\PHPTemplate\TextTemplate;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(TextTemplate::class)]
 final class TextTemplateTest extends TestCase {
 	#[DataProvider('getContentsProvider')]
 	public function testGetContents(string $tpl, array $args, string $exp): void {

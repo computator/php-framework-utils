@@ -4,8 +4,10 @@ use Computator\FrameworkUtils\PHPTemplate\Exceptions;
 use Computator\FrameworkUtils\PHPTemplate\StaticTemplateResolver;
 use Computator\FrameworkUtils\PHPTemplate\TemplateBase;
 use Computator\FrameworkUtils\PHPTemplate\TextTemplate;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(StaticTemplateResolver::class)]
 final class StaticTemplateResolverTest extends TestCase {
 	public function testTemplateMappingFound(): void {
 		$tc_success = new class ('') extends TemplateBase {

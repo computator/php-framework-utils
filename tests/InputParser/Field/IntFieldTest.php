@@ -1,10 +1,12 @@
 <?php declare(strict_types=1);
 
 use Computator\FrameworkUtils\InputParser\Field\IntField;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(IntField::class)]
 final class IntFieldTest extends TestCase {
 	#[TestDox('$value parses as $expected')]
 	#[TestWith(['3', 3])]

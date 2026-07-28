@@ -4,8 +4,10 @@ use Computator\FrameworkUtils\PHPTemplate\Exceptions;
 use Computator\FrameworkUtils\PHPTemplate\FileTemplate;
 use Computator\FrameworkUtils\PHPTemplate\TemplateBase;
 use Computator\FrameworkUtils\PHPTemplate\TemplateResolver;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(TemplateResolver::class)]
 final class TemplateResolverTest extends TestCase {
 	public function testNewClassMustBeTemplateClass(): void {
 		$this->expectException(TypeError::class);

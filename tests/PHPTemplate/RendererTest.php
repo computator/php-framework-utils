@@ -3,8 +3,10 @@
 use Computator\FrameworkUtils\PHPTemplate\FileTemplate;
 use Computator\FrameworkUtils\PHPTemplate\Renderer;
 use Computator\FrameworkUtils\PHPTemplate\TextTemplate;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Renderer::class)]
 final class RendererTest extends TestCase {
 	public function testBasicTextTemplateRender(): void {
 		$r = new Renderer(new TextTemplate('asdf'));
