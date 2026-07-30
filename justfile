@@ -14,6 +14,7 @@ coverage-ctr-name := file_name(justfile_directory()) + '_php-coverage'
 coverage-ctr-containerfile := '''
 	FROM docker.io/library/php:8.1-cli-alpine
 	RUN apk add $PHPIZE_DEPS && pecl install pcov && docker-php-ext-enable pcov
+	STOPSIGNAL SIGKILL
 '''
 
 coverage-start:
@@ -26,7 +27,7 @@ coverage-start:
 		sleep inf
 
 coverage-stop:
-	podman kill '{{ coverage-ctr-name }}'
+	podman rm -f '{{ coverage-ctr-name }}'
 coverage *ARGS='tests --coverage-text --show-uncovered-for-coverage-text':
 	podman exec -it '{{ coverage-ctr-name }}' /app/vendor/bin/phpunit \
 	--coverage-filter /app/src {{ARGS}}
