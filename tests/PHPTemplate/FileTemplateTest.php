@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
+use Computator\FrameworkUtils\PHPTemplate\Exceptions;
 use Computator\FrameworkUtils\PHPTemplate\FileTemplate;
-use Computator\FrameworkUtils\PHPTemplate\Renderer;
 use Computator\FrameworkUtils\PHPTemplate\TemplateRuntimeController;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -9,6 +9,16 @@ use PHPUnit\Framework\TestCase;
 
 #[CoversClass(FileTemplate::class)]
 final class FileTemplateTest extends TestCase {
+	public function testEmptyPath(): void {
+		$this->expectException(Exceptions\TemplateNotFoundException::class);
+		new FileTemplate('');
+	}
+
+	public function testNonexistentFile(): void {
+		$this->expectException(Exceptions\TemplateNotFoundException::class);
+		new FileTemplate('nonexistent_file_asdf');
+	}
+
 	#[DataProvider('getContentsProvider')]
 	public function testGetContents(string $tpl, array $args, string $exp): void {
 		$fd = tmpfile();
@@ -29,6 +39,17 @@ final class FileTemplateTest extends TestCase {
 			'length' => ['asdf', ['length' => 2], 'as'],
 			'offset and length' => ['asdf', ['offset' => 1, 'length' => 2], 'sd'],
 		];
+	}
+
+	public function testGetContentsError(): void {
+		$fd = tmpfile();
+		['uri' => $path] = stream_get_meta_data($fd);
+
+		$t = new FileTemplate($path);
+		fclose($fd);
+
+		$this->expectException(Exceptions\TemplateRenderException::class);
+		$t->get_contents();
 	}
 
 	public function testExecuteOutput(): void {
