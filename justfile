@@ -28,6 +28,6 @@ coverage-start:
 
 coverage-stop:
 	podman rm -f '{{ coverage-ctr-name }}'
-coverage *ARGS='tests --coverage-text --show-uncovered-for-coverage-text':
-	podman exec -it '{{ coverage-ctr-name }}' /app/vendor/bin/phpunit \
-	--coverage-filter /app/src {{ARGS}}
+coverage-call *ARGS:
+	podman exec -it '{{ coverage-ctr-name }}' /app/vendor/bin/phpunit {{ARGS}}
+coverage *ARGS='tests': (coverage-call "--coverage-filter src/ --coverage-text --show-uncovered-for-coverage-text" ARGS)
