@@ -14,7 +14,7 @@ final class StaticTemplateResolverTest extends TestCase {
 			public function __construct(
 				public readonly string $value,
 			) {}
-			public function execute(mixed ...$__context): mixed {
+			public function execute(array $context, mixed ...$controller_args): mixed {
 				return null;
 			}
 			public function get_contents(int $offset = 0, int|null $length = null): string {
@@ -38,7 +38,7 @@ final class StaticTemplateResolverTest extends TestCase {
 			public function __construct(
 				public readonly string $value,
 			) {}
-			public function execute(mixed ...$__context): mixed {
+			public function execute(array $context, mixed ...$controller_args): mixed {
 				return null;
 			}
 			public function get_contents(int $offset = 0, int|null $length = null): string {

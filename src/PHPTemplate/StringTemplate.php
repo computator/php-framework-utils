@@ -3,11 +3,9 @@
 namespace Computator\FrameworkUtils\PHPTemplate;
 
 class StringTemplate extends TemplateBase {
-	public readonly string $content;
-
-	public function __construct(string $content) {
-		$this->content = $content;
-	}
+	public function __construct(
+		public readonly string $content,
+	) {}
 
 	public function get_contents(int $offset = 0, ?int $length = null): string {
 		return substr($this->content, $offset, $length);

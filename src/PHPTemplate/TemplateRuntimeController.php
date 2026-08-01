@@ -2,15 +2,18 @@
 
 namespace Computator\FrameworkUtils\PHPTemplate;
 
+use ReflectionMethod;
+
 class TemplateRuntimeController {
 
 	use ExecInClass;
 
 	public static function getConstructorTestArgs(\PHPUnit\Framework\TestCase $tc): array {
-		return (fn () => [
-			'renderer' => $this->createStub(Renderer::class),
-			'template' => $this->createStub(TemplateBase::class),
-		])->call($tc);
+		$tc_createStub = new ReflectionMethod($tc::class, 'createStub');
+		return [
+			'renderer' => $tc_createStub->invoke($tc, Renderer::class),
+			'template' => $tc_createStub->invoke($tc, TemplateBase::class),
+		];
 	}
 	public function __construct(
 		public readonly Renderer $renderer,

@@ -17,7 +17,7 @@ final class TemplateResolverTest extends TestCase {
 	public function testTemplateFoundReturnsTemplate(): void {
 		$tc_success = new class extends TemplateBase {
 			public function __construct() {}
-			public function execute(mixed ...$__context): mixed {
+			public function execute(array $context, mixed ...$controller_args): mixed {
 				return null;
 			}
 			public function get_contents(int $offset = 0, int|null $length = null): string {
@@ -40,7 +40,7 @@ final class TemplateResolverTest extends TestCase {
 				}
 				throw new Exceptions\TemplateNotFoundException("Not found");
 			}
-			public function execute(mixed ...$__context): mixed {
+			public function execute(array $context, mixed ...$controller_args): mixed {
 				return null;
 			}
 			public function get_contents(int $offset = 0, int|null $length = null): string {

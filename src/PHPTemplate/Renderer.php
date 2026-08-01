@@ -2,6 +2,7 @@
 
 namespace Computator\FrameworkUtils\PHPTemplate;
 
+use function array_key_exists;
 use function is_string;
 
 class Renderer {
@@ -28,6 +29,7 @@ class Renderer {
 	}
 
 	protected function do_render(TemplateBase $tpl): void {
+		// TODO: handle execute return values
 		$tpl->execute(
 			[],
 			renderer: $this,
@@ -42,6 +44,17 @@ class Renderer {
 			$tpl,
 		);
 		$this->tpl_proxy_map[$proxy->id] = $tpl;
+		return $proxy;
+	}
+
+	public function getTemplateInstanceAsProxyById(int $orig_proxy_id): ?RenderObjects\TemplateRenderProxy {
+		if (!array_key_exists($orig_proxy_id, $this->tpl_proxy_map))
+			return null;
+		$proxy = new RenderObjects\TemplateRenderProxy(
+			$this,
+			$this->tpl_proxy_map[$orig_proxy_id],
+		);
+		$this->tpl_proxy_map[$proxy->id] = $this->tpl_proxy_map[$orig_proxy_id];
 		return $proxy;
 	}
 
