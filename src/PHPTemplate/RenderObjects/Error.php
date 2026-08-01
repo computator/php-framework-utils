@@ -2,13 +2,13 @@
 
 namespace Computator\FrameworkUtils\PHPTemplate\RenderObjects;
 
+use Computator\FrameworkUtils\PHPTemplate\Exceptions;
 use Computator\FrameworkUtils\PHPTemplate\Renderer;
-use Exception;
 
 class Error {
 	public function __construct(
 		protected readonly Renderer $renderer,
-		public readonly Exception $exception,
+		public readonly Exceptions\TemplateRenderException $exception,
 	) {}
 
 	public function __call(string $method, $args): self {

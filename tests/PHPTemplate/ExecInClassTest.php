@@ -1,13 +1,10 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 use Computator\FrameworkUtils\PHPTemplate\ExecInClass;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ExecInClass::class)]
-
 final class ExecInClassTest extends TestCase {
 	public function testFuncCalledInClassContextWithData(): void {
 		$tc = new class {
