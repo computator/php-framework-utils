@@ -12,12 +12,12 @@ class TemplateRuntimeController {
 		$tc_createStub = new ReflectionMethod($tc::class, 'createStub');
 		return [
 			'renderer' => $tc_createStub->invoke($tc, Renderer::class),
-			'template' => $tc_createStub->invoke($tc, TemplateBase::class),
+			'template' => $tc_createStub->invoke($tc, Templates\Base::class),
 		];
 	}
 	public function __construct(
 		public readonly Renderer $renderer,
-		protected readonly TemplateBase $template,
+		protected readonly Templates\Base $template,
 	) {}
 
 	public function tpl(string $template): RenderObjects\TemplateRenderProxy|RenderObjects\Error {

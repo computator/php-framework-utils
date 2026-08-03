@@ -1,22 +1,22 @@
 <?php declare(strict_types=1);
 
 use Computator\FrameworkUtils\PHPTemplate\Exceptions;
-use Computator\FrameworkUtils\PHPTemplate\FileTemplate;
+use Computator\FrameworkUtils\PHPTemplate\Templates;
 use Computator\FrameworkUtils\PHPTemplate\TemplateRuntimeController;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(FileTemplate::class)]
-final class FileTemplateTest extends TestCase {
+#[CoversClass(Templates\File::class)]
+final class FileTest extends TestCase {
 	public function testEmptyPath(): void {
 		$this->expectException(Exceptions\TemplateNotFoundException::class);
-		new FileTemplate('');
+		new Templates\File('');
 	}
 
 	public function testNonexistentFile(): void {
 		$this->expectException(Exceptions\TemplateNotFoundException::class);
-		new FileTemplate('nonexistent_file_asdf');
+		new Templates\File('nonexistent_file_asdf');
 	}
 
 	#[DataProvider('getContentsProvider')]
@@ -26,7 +26,7 @@ final class FileTemplateTest extends TestCase {
 
 		fwrite($fd, $tpl);
 
-		$t = new FileTemplate($path);
+		$t = new Templates\File($path);
 		$this->assertEquals($exp, $t->get_contents(...$args));
 
 		fclose($fd);
@@ -45,7 +45,7 @@ final class FileTemplateTest extends TestCase {
 		$fd = tmpfile();
 		['uri' => $path] = stream_get_meta_data($fd);
 
-		$t = new FileTemplate($path);
+		$t = new Templates\File($path);
 		fclose($fd);
 
 		$this->expectException(Exceptions\TemplateRenderException::class);
@@ -66,7 +66,7 @@ final class FileTemplateTest extends TestCase {
 			TPL
 		);
 
-		$t = new FileTemplate($path);
+		$t = new Templates\File($path);
 		$this->expectOutputString("before\nasdf");
 		$rv = $t->execute(
 			['var' => 'asdf'],
@@ -87,7 +87,7 @@ final class FileTemplateTest extends TestCase {
 			TPL
 		);
 
-		$t = new FileTemplate($path);
+		$t = new Templates\File($path);
 		$rv = $t->execute(
 			[],
 			...TemplateRuntimeController::getConstructorTestArgs($this),

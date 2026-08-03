@@ -1,10 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Computator\FrameworkUtils\PHPTemplate;
+namespace Computator\FrameworkUtils\PHPTemplate\Templates;
 
-use Closure;
-
-abstract class TemplateBase {
+abstract class Base {
 	abstract public function get_contents(int $offset = 0, ?int $length = null): string;
 	abstract public function execute(array $context, mixed ...$controller_args): mixed;
 }

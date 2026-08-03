@@ -3,14 +3,14 @@
 namespace Computator\FrameworkUtils\PHPTemplate\RenderObjects;
 
 use Computator\FrameworkUtils\PHPTemplate\Renderer;
-use Computator\FrameworkUtils\PHPTemplate\TemplateBase;
+use Computator\FrameworkUtils\PHPTemplate\Templates;
 
 class TemplateRenderProxy {
 	protected static int $next_id = 1;
 	public readonly int $id;
 	public function __construct(
 		protected readonly Renderer $renderer,
-		protected readonly TemplateBase $tpl,
+		protected readonly Templates\Base $tpl,
 	) {
 		$this->id = self::$next_id++;
 	}

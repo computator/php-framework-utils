@@ -3,7 +3,7 @@
 use Computator\FrameworkUtils\PHPTemplate\Renderer;
 use Computator\FrameworkUtils\PHPTemplate\StaticTemplateResolver;
 use Computator\FrameworkUtils\PHPTemplate\TemplateResolver;
-use Computator\FrameworkUtils\PHPTemplate\TextTemplate;
+use Computator\FrameworkUtils\PHPTemplate\Templates;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -13,7 +13,7 @@ final class TemplatesTest extends TestCase {
 	#[DataProvider('templatesProvider')]
 	public function testTemplate(string $template, array $deps, string $expected): void {
 		$r = new Renderer(
-			new TextTemplate($template),
+			new Templates\PHPString($template),
 			new StaticTemplateResolver($deps),
 		);
 		$out = $r->renderToString();

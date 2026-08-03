@@ -1,8 +1,7 @@
 <?php declare(strict_types=1);
 
 use Computator\FrameworkUtils\PHPTemplate\Exceptions;
-use Computator\FrameworkUtils\PHPTemplate\FileTemplate;
-use Computator\FrameworkUtils\PHPTemplate\TemplateBase;
+use Computator\FrameworkUtils\PHPTemplate\Templates;
 use Computator\FrameworkUtils\PHPTemplate\TemplateResolver;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -15,7 +14,7 @@ final class TemplateResolverTest extends TestCase {
 	}
 
 	public function testTemplateFoundReturnsTemplate(): void {
-		$tc_success = new class extends TemplateBase {
+		$tc_success = new class extends Templates\Base {
 			public function __construct() {}
 			public function execute(array $context, mixed ...$controller_args): mixed {
 				return null;
@@ -30,7 +29,7 @@ final class TemplateResolverTest extends TestCase {
 	}
 
 	public function testTemplateNotFoundThrows(): void {
-		$tc_fail = new class extends TemplateBase {
+		$tc_fail = new class extends Templates\Base {
 			public function __construct() {
 				static $first = true;
 				// don't fail first time to allow creating anonymous class
@@ -63,7 +62,7 @@ final class TemplateResolverTest extends TestCase {
 
 		$r = new TemplateResolver();
 		$t = $r->resolve($path);
-		$this->assertInstanceOf(FileTemplate::class, $t);
+		$this->assertInstanceOf(Templates\File::class, $t);
 		$this->assertEquals($path, $t->path);
 
 		fclose($fd);

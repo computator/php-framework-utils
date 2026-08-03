@@ -1,17 +1,16 @@
 <?php declare(strict_types=1);
 
-use Computator\FrameworkUtils\PHPTemplate\Renderer;
 use Computator\FrameworkUtils\PHPTemplate\TemplateRuntimeController;
-use Computator\FrameworkUtils\PHPTemplate\TextTemplate;
+use Computator\FrameworkUtils\PHPTemplate\Templates;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(TextTemplate::class)]
-final class TextTemplateTest extends TestCase {
+#[CoversClass(Templates\PHPString::class)]
+final class PHPStringTest extends TestCase {
 	#[DataProvider('getContentsProvider')]
 	public function testGetContents(string $tpl, array $args, string $exp): void {
-		$t = new TextTemplate($tpl);
+		$t = new Templates\PHPString($tpl);
 		$this->assertEquals($exp, $t->get_contents(...$args));
 	}
 
@@ -25,7 +24,7 @@ final class TextTemplateTest extends TestCase {
 	}
 
 	public function testExecuteOutput(): void {
-		$t = new TextTemplate(<<<'TPL'
+		$t = new Templates\PHPString(<<<'TPL'
 			before
 			<?php
 			echo "$var";
@@ -43,7 +42,7 @@ final class TextTemplateTest extends TestCase {
 	}
 
 	public function testVerifyUsesRootNamespace(): void {
-		$t = new TextTemplate(<<<'TPL'
+		$t = new Templates\PHPString(<<<'TPL'
 			<?php
 			return __NAMESPACE__;
 			TPL

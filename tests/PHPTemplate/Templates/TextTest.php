@@ -1,15 +1,15 @@
 <?php declare(strict_types=1);
 
-use Computator\FrameworkUtils\PHPTemplate\StringTemplate;
+use Computator\FrameworkUtils\PHPTemplate\Templates;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(StringTemplate::class)]
-final class StringTemplateTest extends TestCase {
+#[CoversClass(Templates\Text::class)]
+final class TextTest extends TestCase {
 	#[DataProvider('getContentsProvider')]
 	public function testGetContents(string $tpl, array $args, string $exp): void {
-		$t = new StringTemplate($tpl);
+		$t = new Templates\Text($tpl);
 		$this->assertEquals($exp, $t->get_contents(...$args));
 	}
 
@@ -23,14 +23,14 @@ final class StringTemplateTest extends TestCase {
 	}
 
 	public function testExecutePrintsContent(): void {
-		$t = new StringTemplate("asdf\nqwer");
+		$t = new Templates\Text("asdf\nqwer");
 		$this->expectOutputString("asdf\nqwer");
 		$rv = $t->execute([]);
 		$this->assertNull($rv);
 	}
 
 	public function testExecuteDoesNotRunPhp(): void {
-		$t = new StringTemplate('<?php echo "hello"; ?>');
+		$t = new Templates\Text('<?php echo "hello"; ?>');
 		$this->expectOutputString('<?php echo "hello"; ?>');
 		$t->execute([]);
 	}

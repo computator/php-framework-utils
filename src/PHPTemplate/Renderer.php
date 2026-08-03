@@ -6,12 +6,12 @@ use function array_key_exists;
 use function is_string;
 
 class Renderer {
-	protected readonly TemplateBase $root_template;
+	protected readonly Templates\Base $root_template;
 	protected readonly TemplateResolver $resolver;
 	protected bool $rendering_to_string;
 	protected array $tpl_proxy_map = [];
 
-	public function __construct(TemplateBase $template, TemplateResolver $resolver = new TemplateResolver()) {
+	public function __construct(Templates\Base $template, TemplateResolver $resolver = new TemplateResolver()) {
 		$this->root_template = $template;
 		$this->resolver = $resolver;
 	}
@@ -28,7 +28,7 @@ class Renderer {
 		return ob_get_clean();
 	}
 
-	protected function do_render(TemplateBase $tpl): void {
+	protected function do_render(Templates\Base $tpl): void {
 		// TODO: handle execute return values
 		$tpl->execute(
 			[],
@@ -62,9 +62,9 @@ class Renderer {
 		$this->do_render($this->tpl_proxy_map[$proxy->id]);
 	}
 
-	public function renderError(TextTemplate|StringTemplate|string $error): void {
+	public function renderError(Templates\PHPString|Templates\Text|string $error): void {
 		if (is_string($error))
-			$error = new StringTemplate($error);
+			$error = new Templates\Text($error);
 		$this->do_render($error);
 	}
 }

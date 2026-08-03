@@ -2,15 +2,14 @@
 
 use Computator\FrameworkUtils\PHPTemplate\Exceptions;
 use Computator\FrameworkUtils\PHPTemplate\StaticTemplateResolver;
-use Computator\FrameworkUtils\PHPTemplate\TemplateBase;
-use Computator\FrameworkUtils\PHPTemplate\TextTemplate;
+use Computator\FrameworkUtils\PHPTemplate\Templates;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(StaticTemplateResolver::class)]
 final class StaticTemplateResolverTest extends TestCase {
 	public function testTemplateMappingFound(): void {
-		$tc_success = new class ('') extends TemplateBase {
+		$tc_success = new class ('') extends Templates\Base {
 			public function __construct(
 				public readonly string $value,
 			) {}
@@ -29,12 +28,12 @@ final class StaticTemplateResolverTest extends TestCase {
 			],
 			$tc_success::class,
 		))->resolve('asdf');
-		$this->assertInstanceOf(TemplateBase::class, $resolved);
+		$this->assertInstanceOf(Templates\Base::class, $resolved);
 		$this->assertEquals('one', $resolved->value);
 	}
 
 	public function testTemplateMappingNotFound(): void {
-		$tc_success = new class ('') extends TemplateBase {
+		$tc_success = new class ('') extends Templates\Base {
 			public function __construct(
 				public readonly string $value,
 			) {}
@@ -61,7 +60,7 @@ final class StaticTemplateResolverTest extends TestCase {
 			'asdf' => 'one',
 			'qwer' => 'two',
 		]))->resolve('asdf');
-		$this->assertInstanceOf(TextTemplate::class, $resolved);
+		$this->assertInstanceOf(Templates\PHPString::class, $resolved);
 		$this->assertEquals('one', $resolved->content);
 	}
 }

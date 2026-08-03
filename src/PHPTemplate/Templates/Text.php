@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Computator\FrameworkUtils\PHPTemplate;
+namespace Computator\FrameworkUtils\PHPTemplate\Templates;
 
-class StringTemplate extends TemplateBase {
+class Text extends Base {
 	public function __construct(
 		public readonly string $content,
 	) {}

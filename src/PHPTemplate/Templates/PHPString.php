@@ -1,8 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace Computator\FrameworkUtils\PHPTemplate;
+namespace Computator\FrameworkUtils\PHPTemplate\Templates;
 
-class TextTemplate extends TemplateBase {
+use Computator\FrameworkUtils\PHPTemplate\TemplateRuntimeController;
+
+class PHPString extends Base {
 	public readonly string $content;
 
 	public function __construct(string $content) {

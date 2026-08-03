@@ -1,8 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace Computator\FrameworkUtils\PHPTemplate;
+namespace Computator\FrameworkUtils\PHPTemplate\Templates;
 
-class FileTemplate extends TemplateBase {
+use Computator\FrameworkUtils\PHPTemplate\Exceptions;
+use Computator\FrameworkUtils\PHPTemplate\TemplateRuntimeController;
+
+class File extends Base {
 	public readonly string $path;
 
 	public function __construct(string $path) {
