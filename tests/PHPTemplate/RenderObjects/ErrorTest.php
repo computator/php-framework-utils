@@ -1,5 +1,7 @@
 <?php declare(strict_types=1);
 
+namespace Computator\FrameworkUtils\Test\RenderObjects;
+
 use Computator\FrameworkUtils\PHPTemplate\Exceptions;
 use Computator\FrameworkUtils\PHPTemplate\Renderer;
 use Computator\FrameworkUtils\PHPTemplate\RenderObjects\Error;

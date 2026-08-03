@@ -1,5 +1,7 @@
 <?php declare(strict_types=1);
 
+namespace Computator\FrameworkUtils\Test\RenderObjects;
+
 use Computator\FrameworkUtils\PHPTemplate\Renderer;
 use Computator\FrameworkUtils\PHPTemplate\RenderObjects\TemplateRenderProxy;
 use Computator\FrameworkUtils\PHPTemplate\Templates;

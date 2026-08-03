@@ -1,5 +1,7 @@
 <?php declare(strict_types=1);
 
+namespace Computator\FrameworkUtils\Test;
+
 use Computator\FrameworkUtils\PHPTemplate\Exceptions;
 use Computator\FrameworkUtils\PHPTemplate\StaticTemplateResolver;
 use Computator\FrameworkUtils\PHPTemplate\Templates;

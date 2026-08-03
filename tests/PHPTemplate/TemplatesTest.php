@@ -1,8 +1,9 @@
 <?php declare(strict_types=1);
 
+namespace Computator\FrameworkUtils\Test;
+
 use Computator\FrameworkUtils\PHPTemplate\Renderer;
 use Computator\FrameworkUtils\PHPTemplate\StaticTemplateResolver;
-use Computator\FrameworkUtils\PHPTemplate\TemplateResolver;
 use Computator\FrameworkUtils\PHPTemplate\Templates;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;

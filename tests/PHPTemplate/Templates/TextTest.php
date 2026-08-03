@@ -1,5 +1,7 @@
 <?php declare(strict_types=1);
 
+namespace Computator\FrameworkUtils\Test\Templates;
+
 use Computator\FrameworkUtils\PHPTemplate\Templates;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

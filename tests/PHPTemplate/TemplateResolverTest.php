@@ -1,5 +1,11 @@
 <?php declare(strict_types=1);
 
+namespace Computator\FrameworkUtils\Test;
+
+use stdClass;
+use TypeError;
+use ValueError;
+
 use Computator\FrameworkUtils\PHPTemplate\Exceptions;
 use Computator\FrameworkUtils\PHPTemplate\Templates;
 use Computator\FrameworkUtils\PHPTemplate\TemplateResolver;

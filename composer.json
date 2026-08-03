@@ -8,6 +8,11 @@
             "Computator\\FrameworkUtils\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Computator\\FrameworkUtils\\Test\\": "tests/"
+        }
+    },
     "require-dev": {
         "phpunit/phpunit": "^10"
     },
