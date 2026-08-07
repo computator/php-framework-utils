@@ -39,10 +39,10 @@
 	parent after
 	INPUT,
 	[
-		'child_tpl' => <<<'CHILD'
+		'child_tpl' => <<<'DEP'
 		child
 		:
-		CHILD,
+		DEP,
 	],
 	<<<'EXPECTED'
 	parent before
@@ -50,5 +50,38 @@
 	:parent after
 	EXPECTED,
 ],
+
+/* TODO: implement
+'base template' => [
+	<<<'INPUT'
+	main beforedep
+	<? self::inherit('base_tpl') ?>
+	main beforeblock
+	<? self::define('block1') ?>
+		main block
+		:
+	<? self::define_end() ?>
+	main after
+	INPUT,
+	[
+		'base_tpl' => <<<'DEP'
+		base beforeblock
+		<? self::block('block1') ?>
+		base beforeprimary
+		<? self::primary() ?>
+		base after
+		DEP,
+	],
+	<<<'EXPECTED'
+	base beforeblock
+		main block
+		:base beforeprimary
+	main beforedep
+	main beforeblock
+	main after
+	base after
+	EXPECTED,
+],
+*/
 
 ] ?>
