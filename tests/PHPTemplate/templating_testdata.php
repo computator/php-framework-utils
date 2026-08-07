@@ -7,6 +7,14 @@
 	'',
 ],
 
+'empty PHP 8.5' => [
+	<<<'INPUT'
+	INPUT,
+	[],
+	'',
+	'php_min_ver' => 8.5,
+],
+
 'basic text' => [
 	<<<'INPUT'
 	asdf
