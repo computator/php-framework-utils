@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(StaticTemplateResolver::class)]
 final class StaticTemplateResolverTest extends TestCase {
 	public function testTemplateMappingFound(): void {
-		$tc_success = new class ('') extends Templates\Base {
+		$tc = new class ('') extends Templates\Base {
 			public function __construct(
 				public readonly string $value,
 			) {}
@@ -28,14 +28,14 @@ final class StaticTemplateResolverTest extends TestCase {
 				'asdf' => 'one',
 				'qwer' => 'two',
 			],
-			$tc_success::class,
+			$tc::class,
 		))->resolve('asdf');
 		$this->assertInstanceOf(Templates\Base::class, $resolved);
 		$this->assertEquals('one', $resolved->value);
 	}
 
 	public function testTemplateMappingNotFound(): void {
-		$tc_success = new class ('') extends Templates\Base {
+		$tc = new class ('') extends Templates\Base {
 			public function __construct(
 				public readonly string $value,
 			) {}
@@ -53,8 +53,31 @@ final class StaticTemplateResolverTest extends TestCase {
 				'asdf' => 'one',
 				'qwer' => 'two',
 			],
-			$tc_success::class,
+			$tc::class,
 		))->resolve('invalid');
+	}
+
+	public function testArrayMappingValue(): void {
+		$tc = new class ('', 0) extends Templates\Base {
+			public function __construct(
+				string $arg1,
+				int $arg2,
+			) {}
+			public function execute(array $context, mixed ...$controller_args): mixed {
+				return null;
+			}
+			public function get_contents(int $offset = 0, int|null $length = null): string {
+				return "";
+			}
+		};
+
+		$resolved = (new StaticTemplateResolver(
+			[
+				'asdf' => ['one', 1],
+			],
+			$tc::class,
+		))->resolve('asdf');
+		$this->assertInstanceOf(Templates\Base::class, $resolved);
 	}
 
 	public function testDefaultTemplateClass(): void {
