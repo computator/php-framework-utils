@@ -2,6 +2,7 @@
 
 namespace Computator\FrameworkUtils\PHPTemplate;
 
+use Throwable;
 use function array_key_exists;
 use function is_string;
 
@@ -30,11 +31,18 @@ class Renderer {
 
 	protected function do_render(Templates\Base $tpl): void {
 		// TODO: handle execute return values
-		$tpl->execute(
-			[],
-			renderer: $this,
-			template: $tpl,
-		);
+		try {
+			$tpl->execute(
+				[],
+				renderer: $this,
+				template: $tpl,
+			);
+		} catch (Throwable $t) {
+			throw new Exceptions\TemplateRenderException(
+				"error while rendering template: {$t->getMessage()}",
+				previous: $t,
+			);
+		}
 	}
 
 	public function getTemplateAsProxy(string $template): RenderObjects\TemplateRenderProxy {

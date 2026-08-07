@@ -2,8 +2,10 @@
 
 namespace Computator\FrameworkUtils\Test;
 
+use Exception;
 use ReflectionProperty;
 
+use Computator\FrameworkUtils\PHPTemplate\Exceptions;
 use Computator\FrameworkUtils\PHPTemplate\Renderer;
 use Computator\FrameworkUtils\PHPTemplate\RenderObjects\TemplateRenderProxy;
 use Computator\FrameworkUtils\PHPTemplate\Templates;
@@ -36,6 +38,17 @@ final class RendererTest extends TestCase {
 		$this->expectOutputString('');
 		$rv = $r->renderToString();
 		$this->assertSame('asdf', $rv);
+	}
+
+	public function testRenderTemplateWithError(): void {
+		$t = $this->createStub(Templates\Base::class);
+		$t
+			->method('execute')
+			->willThrowException(new Exception('an error'));
+		$r = new Renderer($t);
+		$this->expectOutputString('');
+		$this->expectException(Exceptions\TemplateRenderException::class);
+		$r->render();
 	}
 
 	public function testTemplateExecuteContext(): void {
