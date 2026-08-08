@@ -2,6 +2,8 @@
 
 namespace Computator\FrameworkUtils\PHPTemplate;
 
+use Computator\FrameworkUtils\PHPTemplate\Exceptions\RendererException;
+use Computator\FrameworkUtils\PHPTemplate\Exceptions\TemplateRenderException;
 use ReflectionMethod;
 
 class TemplateRuntimeController {
@@ -25,6 +27,14 @@ class TemplateRuntimeController {
 			return $this->renderer->getTemplateAsProxy($template);
 		} catch (Exceptions\TemplateNotFoundException $e) {
 			return new RenderObjects\Error($this->renderer, $e);
+		}
+	}
+
+	public function inherit(string $parent_template): void {
+		try {
+			$this->renderer->setParentForTemplate($this->template, $parent_template);
+		} catch (Exceptions\RendererException $e) {
+			throw new Exceptions\TemplateRenderException("inherit can not be called more than once", previous: $e);
 		}
 	}
 }

@@ -2,7 +2,13 @@
 
 namespace Computator\FrameworkUtils\PHPTemplate;
 
+use Computator\FrameworkUtils\PHPTemplate\Exceptions\RendererException;
+use Computator\FrameworkUtils\PHPTemplate\Templates;
+
+use RuntimeException;
+use SplObjectStorage;
 use Throwable;
+
 use function array_key_exists;
 use function is_string;
 use function ob_get_level,ob_end_flush;
@@ -12,10 +18,13 @@ class Renderer {
 	protected readonly TemplateResolver $resolver;
 	protected bool $rendering_to_string;
 	protected array $tpl_proxy_map = [];
+	protected SplObjectStorage $tpl_parent_map;
 
 	public function __construct(Templates\Base $template, TemplateResolver $resolver = new TemplateResolver()) {
 		$this->root_template = $template;
 		$this->resolver = $resolver;
+
+		$this->tpl_parent_map = new SplObjectStorage();
 	}
 
 	public function render(): void {
@@ -84,5 +93,11 @@ class Renderer {
 		if (is_string($error))
 			$error = new Templates\Text($error);
 		$this->do_render($error);
+	}
+
+	public function setParentForTemplate(Templates\Base $tpl, string $parent_template): void {
+		if (isset($this->tpl_parent_map[$tpl]))
+			throw new Exceptions\RendererException("invalid state: 'tpl' already has an associated parent");
+		$this->tpl_parent_map[$tpl] = $this->resolver->resolve($parent_template);
 	}
 }

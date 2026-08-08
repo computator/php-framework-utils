@@ -2,7 +2,9 @@
 
 namespace Computator\FrameworkUtils\Test;
 
+use Computator\FrameworkUtils\PHPTemplate\Exceptions\RendererException;
 use Exception;
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use ReflectionProperty;
 
 use Computator\FrameworkUtils\PHPTemplate\Exceptions;
@@ -194,5 +196,39 @@ final class RendererTest extends TestCase {
 
 		$this->expectOutputString('asdf');
 		$r->renderError('asdf');
+	}
+
+	#[DoesNotPerformAssertions]
+	public function testSetParentForTemplate(): void {
+		$res = new class ([
+			$this->createStub(Templates\Base::class),
+		]) extends TemplateResolver {
+			public function __construct(
+				protected $tpls,
+			) {}
+			protected function map(string $template): Templates\Base {
+				return array_shift($this->tpls);
+			}
+		};
+		$r = new Renderer($this->createStub(Templates\Base::class), $res);
+		$r->setParentForTemplate($this->createStub(Templates\Base::class), 'asdf');
+	}
+
+	public function testSetParentForTemplateTwiceThrows(): void {
+		$res = new class ([
+			$this->createStub(Templates\Base::class),
+		]) extends TemplateResolver {
+			public function __construct(
+				protected $tpls,
+			) {}
+			protected function map(string $template): Templates\Base {
+				return array_shift($this->tpls);
+			}
+		};
+		$t = $this->createStub(Templates\Base::class);
+		$r = new Renderer($this->createStub(Templates\Base::class), $res);
+		$r->setParentForTemplate($t, 'asdf');
+		$this->expectException(Exceptions\RendererException::class);
+		$r->setParentForTemplate($t, 'asdf');
 	}
 }
