@@ -13,6 +13,8 @@ use Computator\FrameworkUtils\PHPTemplate\TemplateResolver;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+use function ob_start;
+
 #[CoversClass(Renderer::class)]
 final class RendererTest extends TestCase {
 	public function testRender(): void {
@@ -48,6 +50,22 @@ final class RendererTest extends TestCase {
 		$r = new Renderer($t);
 		$this->expectOutputString('');
 		$this->expectException(Exceptions\TemplateRenderException::class);
+		$r->render();
+	}
+
+	public function testRenderTemplateWithMismatchedOutputBuffering(): void {
+		$t = $this->createStub(Templates\Base::class);
+		$t
+			->method('execute')
+			->willReturnCallback(function (...$args): void {
+				echo 'asdf';
+				ob_start();
+				echo 'qwer';
+			});
+		$r = new Renderer($t);
+		$this->expectOutputString('asdfqwer');
+		$this->expectException(Exceptions\TemplateRenderException::class);
+		$this->expectExceptionMessageMatches('/output buffer/');
 		$r->render();
 	}
 

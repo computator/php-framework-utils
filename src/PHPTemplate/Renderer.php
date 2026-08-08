@@ -5,6 +5,7 @@ namespace Computator\FrameworkUtils\PHPTemplate;
 use Throwable;
 use function array_key_exists;
 use function is_string;
+use function ob_get_level,ob_end_flush;
 
 class Renderer {
 	protected readonly Templates\Base $root_template;
@@ -30,8 +31,9 @@ class Renderer {
 	}
 
 	protected function do_render(Templates\Base $tpl): void {
-		// TODO: handle execute return values
+		$start_ob_level = ob_get_level();
 		try {
+			// TODO: handle execute return values
 			$tpl->execute(
 				[],
 				renderer: $this,
@@ -42,6 +44,14 @@ class Renderer {
 				"error while rendering template: {$t->getMessage()}",
 				previous: $t,
 			);
+		} finally {
+			if (ob_get_level() > $start_ob_level) {
+				do {
+					ob_end_flush();
+				} while (ob_get_level() > $start_ob_level);
+
+				throw new Exceptions\TemplateRenderException("template did not close it's output buffers!");
+			}
 		}
 	}
 
