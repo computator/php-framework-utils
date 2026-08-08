@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Computator\FrameworkUtils\Test\RenderObjects;
+namespace Computator\FrameworkUtils\Test\PHPTemplate\RenderObjects;
 
 use Computator\FrameworkUtils\PHPTemplate\RenderManager;
 use Computator\FrameworkUtils\PHPTemplate\RenderObjects\TemplateRenderProxy;
