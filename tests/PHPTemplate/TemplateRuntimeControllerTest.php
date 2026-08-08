@@ -3,7 +3,7 @@
 namespace Computator\FrameworkUtils\Test;
 
 use Computator\FrameworkUtils\PHPTemplate\Exceptions;
-use Computator\FrameworkUtils\PHPTemplate\Renderer;
+use Computator\FrameworkUtils\PHPTemplate\RenderManager;
 use Computator\FrameworkUtils\PHPTemplate\RenderObjects;
 use Computator\FrameworkUtils\PHPTemplate\RenderObjects\TemplateRenderProxy;
 use Computator\FrameworkUtils\PHPTemplate\TemplateRuntimeController;
@@ -23,7 +23,7 @@ final class TemplateRuntimeControllerTest extends TestCase {
 
 	public function testTplWithValidTemplateReturnsTemplateRenderProxy(): void {
 		$p = $this->createStub(TemplateRenderProxy::class);
-		$r = $this->createMock(Renderer::class);
+		$r = $this->createMock(RenderManager::class);
 		$r
 			->expects($this->once())
 			->method('getTemplateAsProxy')
@@ -38,7 +38,7 @@ final class TemplateRuntimeControllerTest extends TestCase {
 
 	public function testTplWithInvalidTemplateReturnsError(): void {
 		$e = new Exceptions\TemplateNotFoundException();
-		$r = $this->createMock(Renderer::class);
+		$r = $this->createMock(RenderManager::class);
 		$r
 			->expects($this->once())
 			->method('getTemplateAsProxy')
@@ -53,7 +53,7 @@ final class TemplateRuntimeControllerTest extends TestCase {
 	}
 
 	public function testInheritSetsParent(): void {
-		$r = $this->createMock(Renderer::class);
+		$r = $this->createMock(RenderManager::class);
 		$t = $this->createMock(Templates\Base::class);
 		$r
 			->expects($this->once())
@@ -66,7 +66,7 @@ final class TemplateRuntimeControllerTest extends TestCase {
 	}
 
 	public function testMultipleInheritCallsThrow(): void {
-		$r = $this->createMock(Renderer::class);
+		$r = $this->createMock(RenderManager::class);
 		$t = $this->createMock(Templates\Base::class);
 		$r
 			->expects($this->exactly(2))

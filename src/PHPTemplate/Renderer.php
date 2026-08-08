@@ -2,10 +2,9 @@
 
 namespace Computator\FrameworkUtils\PHPTemplate;
 
-use Computator\FrameworkUtils\PHPTemplate\Exceptions\RendererException;
+use Computator\FrameworkUtils\PHPTemplate\Exceptions;
 use Computator\FrameworkUtils\PHPTemplate\Templates;
 
-use RuntimeException;
 use SplObjectStorage;
 use Throwable;
 
@@ -13,14 +12,18 @@ use function array_key_exists;
 use function is_string;
 use function ob_get_level,ob_end_flush;
 
-class Renderer {
+class Renderer implements RenderManager, RenderClient {
 	protected readonly Templates\Base $root_template;
 	protected readonly TemplateResolver $resolver;
 	protected bool $rendering_to_string;
 	protected array $tpl_proxy_map = [];
 	protected SplObjectStorage $tpl_parent_map;
 
-	public function __construct(Templates\Base $template, TemplateResolver $resolver = new TemplateResolver()) {
+	public static function create(Templates\Base $template, TemplateResolver $resolver = new TemplateResolver()): RenderClient {
+		return new self($template, $resolver);
+	}
+
+	final private function __construct(Templates\Base $template, TemplateResolver $resolver) {
 		$this->root_template = $template;
 		$this->resolver = $resolver;
 

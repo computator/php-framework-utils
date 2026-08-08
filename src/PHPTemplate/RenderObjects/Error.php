@@ -3,11 +3,11 @@
 namespace Computator\FrameworkUtils\PHPTemplate\RenderObjects;
 
 use Computator\FrameworkUtils\PHPTemplate\Exceptions;
-use Computator\FrameworkUtils\PHPTemplate\Renderer;
+use Computator\FrameworkUtils\PHPTemplate\RenderManager;
 
 class Error {
 	public function __construct(
-		protected readonly Renderer $renderer,
+		protected readonly RenderManager $renderer,
 		public readonly Exceptions\TemplateRenderException $exception,
 	) {}
 

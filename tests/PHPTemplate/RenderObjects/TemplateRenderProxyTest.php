@@ -2,7 +2,7 @@
 
 namespace Computator\FrameworkUtils\Test\RenderObjects;
 
-use Computator\FrameworkUtils\PHPTemplate\Renderer;
+use Computator\FrameworkUtils\PHPTemplate\RenderManager;
 use Computator\FrameworkUtils\PHPTemplate\RenderObjects\TemplateRenderProxy;
 use Computator\FrameworkUtils\PHPTemplate\Templates;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(TemplateRenderProxy::class)]
 final class TemplateRenderProxyTest extends TestCase {
 	public function testInstanceIdsAreUnique(): void {
-		$r = $this->createStub(Renderer::class);
+		$r = $this->createStub(RenderManager::class);
 		$t = $this->createStub(Templates\Base::class);
 
 		$p1 = new TemplateRenderProxy($r, $t);
@@ -26,7 +26,7 @@ final class TemplateRenderProxyTest extends TestCase {
 	}
 
 	public function testInvokeRendersSelf(): void {
-		$r = $this->createMock(Renderer::class);
+		$r = $this->createMock(RenderManager::class);
 		$proxy = new TemplateRenderProxy($r, $this->createStub(Templates\Base::class));
 
 		$r

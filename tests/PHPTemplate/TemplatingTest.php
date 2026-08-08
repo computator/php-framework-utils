@@ -32,7 +32,7 @@ final class TemplatingTest extends TestCase {
 	}
 
 	protected function testTemplateImpl(string $template, array $deps, string $expected): void {
-		$r = new Renderer(
+		$r = Renderer::create(
 			new Templates\PHPString($template),
 			new StaticTemplateResolver($deps),
 		);

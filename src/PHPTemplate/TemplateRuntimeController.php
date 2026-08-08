@@ -2,8 +2,8 @@
 
 namespace Computator\FrameworkUtils\PHPTemplate;
 
-use Computator\FrameworkUtils\PHPTemplate\Exceptions\RendererException;
-use Computator\FrameworkUtils\PHPTemplate\Exceptions\TemplateRenderException;
+use Computator\FrameworkUtils\PHPTemplate\Exceptions;
+
 use ReflectionMethod;
 
 class TemplateRuntimeController {
@@ -13,12 +13,12 @@ class TemplateRuntimeController {
 	public static function getConstructorTestArgs(\PHPUnit\Framework\TestCase $tc): array {
 		$tc_createStub = new ReflectionMethod($tc::class, 'createStub');
 		return [
-			'renderer' => $tc_createStub->invoke($tc, Renderer::class),
+			'renderer' => $tc_createStub->invoke($tc, RenderManager::class),
 			'template' => $tc_createStub->invoke($tc, Templates\Base::class),
 		];
 	}
 	public function __construct(
-		public readonly Renderer $renderer,
+		public readonly RenderManager $renderer,
 		protected readonly Templates\Base $template,
 	) {}
 

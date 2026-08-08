@@ -9,6 +9,7 @@ use ReflectionProperty;
 
 use Computator\FrameworkUtils\PHPTemplate\Exceptions;
 use Computator\FrameworkUtils\PHPTemplate\Renderer;
+use Computator\FrameworkUtils\PHPTemplate\RenderManager;
 use Computator\FrameworkUtils\PHPTemplate\RenderObjects\TemplateRenderProxy;
 use Computator\FrameworkUtils\PHPTemplate\Templates;
 use Computator\FrameworkUtils\PHPTemplate\TemplateResolver;
@@ -26,7 +27,7 @@ final class RendererTest extends TestCase {
 			->willReturnCallback(function (...$args): void {
 				echo 'asdf';
 			});
-		$r = new Renderer($t);
+		$r = Renderer::create($t);
 		$this->expectOutputString('asdf');
 		$r->render();
 	}
@@ -38,7 +39,7 @@ final class RendererTest extends TestCase {
 			->willReturnCallback(function (...$args): void {
 				echo 'asdf';
 			});
-		$r = new Renderer($t);
+		$r = Renderer::create($t);
 		$this->expectOutputString('');
 		$rv = $r->renderToString();
 		$this->assertSame('asdf', $rv);
@@ -49,7 +50,7 @@ final class RendererTest extends TestCase {
 		$t
 			->method('execute')
 			->willThrowException(new Exception('an error'));
-		$r = new Renderer($t);
+		$r = Renderer::create($t);
 		$this->expectOutputString('');
 		$this->expectException(Exceptions\TemplateRenderException::class);
 		$r->render();
@@ -64,7 +65,7 @@ final class RendererTest extends TestCase {
 				ob_start();
 				echo 'qwer';
 			});
-		$r = new Renderer($t);
+		$r = Renderer::create($t);
 		$this->expectOutputString('asdfqwer');
 		$this->expectException(Exceptions\TemplateRenderException::class);
 		$this->expectExceptionMessageMatches('/output buffer/');
@@ -85,7 +86,7 @@ final class RendererTest extends TestCase {
 				], $args);
 				return true;
 			}));
-		$r = new Renderer($t);
+		$r = Renderer::create($t);
 		$r->renderToString();
 	}
 
@@ -101,7 +102,8 @@ final class RendererTest extends TestCase {
 				return array_shift($this->tpls);
 			}
 		};
-		$r = new Renderer($this->createStub(Templates\Base::class), $res);
+		/** @var RenderManager $r */
+		$r = Renderer::create($this->createStub(Templates\Base::class), $res);
 		$p = $r->getTemplateAsProxy('test_tpl');
 
 		$tpl_prop = new ReflectionProperty(TemplateRenderProxy::class, 'tpl');
@@ -120,7 +122,8 @@ final class RendererTest extends TestCase {
 				return array_shift($this->tpls);
 			}
 		};
-		$r = new Renderer($this->createStub(Templates\Base::class), $res);
+		/** @var RenderManager $r */
+		$r = Renderer::create($this->createStub(Templates\Base::class), $res);
 		$p1 = $r->getTemplateAsProxy('test_tpl');
 		$p2 = $r->getTemplateAsProxy('test_tpl');
 		$this->assertNotSame($p1, $p2);
@@ -141,7 +144,8 @@ final class RendererTest extends TestCase {
 				return array_shift($this->tpls);
 			}
 		};
-		$r = new Renderer($this->createStub(Templates\Base::class), $res);
+		/** @var RenderManager $r */
+		$r = Renderer::create($this->createStub(Templates\Base::class), $res);
 		$p1 = $r->getTemplateAsProxy('test_tpl');
 		$p2 = $r->getTemplateInstanceAsProxyById($p1->id);
 		$this->assertNotSame($p1, $p2);
@@ -152,7 +156,8 @@ final class RendererTest extends TestCase {
 	}
 
 	public function testGetTemplateInstanceAsProxyByIdWithUnknownId(): void {
-		$r = new Renderer($this->createStub(Templates\Base::class));
+		/** @var RenderManager $r */
+		$r = Renderer::create($this->createStub(Templates\Base::class));
 		$p = $r->getTemplateInstanceAsProxyById(1234);
 		$this->assertNull($p);
 	}
@@ -173,7 +178,8 @@ final class RendererTest extends TestCase {
 			->willReturnCallback(function (...$args): void {
 				echo 'asdf';
 			});
-		$r = new Renderer($this->createStub(Templates\Base::class), $res);
+		/** @var RenderManager $r */
+		$r = Renderer::create($this->createStub(Templates\Base::class), $res);
 		$p = $r->getTemplateAsProxy('test_tpl');
 
 		$tpl_prop = new ReflectionProperty(TemplateRenderProxy::class, 'tpl');
@@ -184,7 +190,8 @@ final class RendererTest extends TestCase {
 	}
 
 	public function testRenderErrorWithStringTemplate(): void {
-		$r = new Renderer($this->createStub(Templates\Base::class));
+		/** @var RenderManager $r */
+		$r = Renderer::create($this->createStub(Templates\Base::class));
 		$e = new Templates\Text('asdf');
 
 		$this->expectOutputString('asdf');
@@ -192,7 +199,8 @@ final class RendererTest extends TestCase {
 	}
 
 	public function testRenderErrorWithString(): void {
-		$r = new Renderer($this->createStub(Templates\Base::class));
+		/** @var RenderManager $r */
+		$r = Renderer::create($this->createStub(Templates\Base::class));
 
 		$this->expectOutputString('asdf');
 		$r->renderError('asdf');
@@ -210,7 +218,8 @@ final class RendererTest extends TestCase {
 				return array_shift($this->tpls);
 			}
 		};
-		$r = new Renderer($this->createStub(Templates\Base::class), $res);
+		/** @var RenderManager $r */
+		$r = Renderer::create($this->createStub(Templates\Base::class), $res);
 		$r->setParentForTemplate($this->createStub(Templates\Base::class), 'asdf');
 	}
 
@@ -226,7 +235,8 @@ final class RendererTest extends TestCase {
 			}
 		};
 		$t = $this->createStub(Templates\Base::class);
-		$r = new Renderer($this->createStub(Templates\Base::class), $res);
+		/** @var RenderManager $r */
+		$r = Renderer::create($this->createStub(Templates\Base::class), $res);
 		$r->setParentForTemplate($t, 'asdf');
 		$this->expectException(Exceptions\RendererException::class);
 		$r->setParentForTemplate($t, 'asdf');
