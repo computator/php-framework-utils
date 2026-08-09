@@ -17,6 +17,7 @@ class TemplateRuntimeController {
 			'template' => $tc_createStub->invoke($tc, Templates\Base::class),
 		];
 	}
+
 	public function __construct(
 		public readonly RenderManager $renderer,
 		protected readonly Templates\Base $template,
