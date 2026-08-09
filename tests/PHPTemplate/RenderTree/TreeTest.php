@@ -9,6 +9,7 @@ use PHPUnit\Framework\MockObject\Rule\InvocationOrder;
 use PHPUnit\Framework\TestCase;
 
 use ArrayIterator;
+use ValueError;
 
 #[CoversClass(Tree::class)]
 final class TreeTest extends TestCase {
@@ -24,11 +25,16 @@ final class TreeTest extends TestCase {
 		return $n;
 	}
 
-	private function mockLeafNodeExpectingGetValue(InvocationOrder $order) {
+	private function mockLeafNode() {
 		$n = $this->createMock(Node::class);
 		$n
 			->method('isLeaf')
 			->willReturn(true);
+		return $n;
+	}
+
+	private function mockLeafNodeExpectingGetValue(InvocationOrder $order) {
+		$n = $this->mockLeafNode();
 		$n
 			->expects($order)
 			->method('getValue');
@@ -148,22 +154,22 @@ final class TreeTest extends TestCase {
 	public function testContainsNodeWithExistingInOriginalTreeSkipsWalk(): void {
 		$tree = new WalkCountingTree($this->stubTreeNodeWithChildren(
 			$this->stubTreeNodeWithChildren(
-				$this->mockLeafNodeExpectingGetValue($this->any()),
-				$this->mockLeafNodeExpectingGetValue($this->any()),
-				$this->mockLeafNodeExpectingGetValue($this->any()),
+				$this->mockLeafNode(),
+				$this->mockLeafNode(),
+				$this->mockLeafNode(),
 			),
-			$this->mockLeafNodeExpectingGetValue($this->any()),
+			$this->mockLeafNode(),
 			$this->stubTreeNodeWithChildren(
-				$this->mockLeafNodeExpectingGetValue($this->any()),
-				$tgt = $this->mockLeafNodeExpectingGetValue($this->any()),
+				$this->mockLeafNode(),
+				$tgt = $this->mockLeafNode(),
 				$this->stubTreeNodeWithChildren(
-					$this->mockLeafNodeExpectingGetValue($this->any()),
-					$this->mockLeafNodeExpectingGetValue($this->any()),
-					$this->mockLeafNodeExpectingGetValue($this->any()),
+					$this->mockLeafNode(),
+					$this->mockLeafNode(),
+					$this->mockLeafNode(),
 				),
-				$this->mockLeafNodeExpectingGetValue($this->any()),
+				$this->mockLeafNode(),
 			),
-			$this->mockLeafNodeExpectingGetValue($this->any()),
+			$this->mockLeafNode(),
 		));
 		$tree::resetCalls();
 		$this->assertTrue($tree->containsNode($tgt));
@@ -173,25 +179,25 @@ final class TreeTest extends TestCase {
 	public function testContainsNodeWithMissingInOriginalTreeWalks(): void {
 		$tree = new WalkCountingTree($this->stubTreeNodeWithChildren(
 			$this->stubTreeNodeWithChildren(
-				$this->mockLeafNodeExpectingGetValue($this->any()),
-				$this->mockLeafNodeExpectingGetValue($this->any()),
-				$this->mockLeafNodeExpectingGetValue($this->any()),
+				$this->mockLeafNode(),
+				$this->mockLeafNode(),
+				$this->mockLeafNode(),
 			),
-			$this->mockLeafNodeExpectingGetValue($this->any()),
+			$this->mockLeafNode(),
 			$this->stubTreeNodeWithChildren(
-				$this->mockLeafNodeExpectingGetValue($this->any()),
-				$this->mockLeafNodeExpectingGetValue($this->any()),
+				$this->mockLeafNode(),
+				$this->mockLeafNode(),
 				$this->stubTreeNodeWithChildren(
-					$this->mockLeafNodeExpectingGetValue($this->any()),
-					$this->mockLeafNodeExpectingGetValue($this->any()),
-					$this->mockLeafNodeExpectingGetValue($this->any()),
+					$this->mockLeafNode(),
+					$this->mockLeafNode(),
+					$this->mockLeafNode(),
 				),
-				$this->mockLeafNodeExpectingGetValue($this->any()),
+				$this->mockLeafNode(),
 			),
-			$this->mockLeafNodeExpectingGetValue($this->any()),
+			$this->mockLeafNode(),
 		));
 		$tree::resetCalls();
-		$this->assertFalse($tree->containsNode($this->mockLeafNodeExpectingGetValue($this->any())));
+		$this->assertFalse($tree->containsNode($this->mockLeafNode()));
 		$this->assertSame(1, $tree::getCalls());
 	}
 
@@ -203,33 +209,33 @@ final class TreeTest extends TestCase {
 		$mutating
 			->method('getIterator')
 			->willReturn(new ArrayIterator([
-				$this->mockLeafNodeExpectingGetValue($this->any()),
+				$this->mockLeafNode(),
 				$this->stubTreeNodeWithChildren(
-					$this->mockLeafNodeExpectingGetValue($this->any()),
-					$tgt = $this->mockLeafNodeExpectingGetValue($this->any()),
-					$this->mockLeafNodeExpectingGetValue($this->any()),
+					$this->mockLeafNode(),
+					$tgt = $this->mockLeafNode(),
+					$this->mockLeafNode(),
 				),
-				$this->mockLeafNodeExpectingGetValue($this->any()),
+				$this->mockLeafNode(),
 			]));
 
 		$tree = new WalkCountingTree($this->stubTreeNodeWithChildren(
 			$this->stubTreeNodeWithChildren(
-				$this->mockLeafNodeExpectingGetValue($this->any()),
-				$this->mockLeafNodeExpectingGetValue($this->any()),
-				$this->mockLeafNodeExpectingGetValue($this->any()),
+				$this->mockLeafNode(),
+				$this->mockLeafNode(),
+				$this->mockLeafNode(),
 			),
-			$this->mockLeafNodeExpectingGetValue($this->any()),
+			$this->mockLeafNode(),
 			$this->stubTreeNodeWithChildren(
-				$this->mockLeafNodeExpectingGetValue($this->any()),
+				$this->mockLeafNode(),
 				$mutating,
 				$this->stubTreeNodeWithChildren(
-					$this->mockLeafNodeExpectingGetValue($this->any()),
-					$this->mockLeafNodeExpectingGetValue($this->any()),
-					$this->mockLeafNodeExpectingGetValue($this->any()),
+					$this->mockLeafNode(),
+					$this->mockLeafNode(),
+					$this->mockLeafNode(),
 				),
-				$this->mockLeafNodeExpectingGetValue($this->any()),
+				$this->mockLeafNode(),
 			),
-			$this->mockLeafNodeExpectingGetValue($this->any()),
+			$this->mockLeafNode(),
 		));
 		$tree::resetCalls();
 		$this->assertTrue($tree->containsNode($tgt));
@@ -244,37 +250,69 @@ final class TreeTest extends TestCase {
 		$mutating
 			->method('getIterator')
 			->willReturn(new ArrayIterator([
-				$this->mockLeafNodeExpectingGetValue($this->any()),
+				$this->mockLeafNode(),
 				$this->stubTreeNodeWithChildren(
-					$this->mockLeafNodeExpectingGetValue($this->any()),
-					$tgt2 = $this->mockLeafNodeExpectingGetValue($this->any()),
-					$tgt1 = $this->mockLeafNodeExpectingGetValue($this->any()),
+					$this->mockLeafNode(),
+					$tgt2 = $this->mockLeafNode(),
+					$tgt1 = $this->mockLeafNode(),
 				),
-				$this->mockLeafNodeExpectingGetValue($this->any()),
+				$this->mockLeafNode(),
 			]));
 
 		$tree = new WalkCountingTree($this->stubTreeNodeWithChildren(
 			$this->stubTreeNodeWithChildren(
-				$this->mockLeafNodeExpectingGetValue($this->any()),
-				$this->mockLeafNodeExpectingGetValue($this->any()),
-				$this->mockLeafNodeExpectingGetValue($this->any()),
+				$this->mockLeafNode(),
+				$this->mockLeafNode(),
+				$this->mockLeafNode(),
 			),
-			$this->mockLeafNodeExpectingGetValue($this->any()),
+			$this->mockLeafNode(),
 			$this->stubTreeNodeWithChildren(
-				$this->mockLeafNodeExpectingGetValue($this->any()),
+				$this->mockLeafNode(),
 				$mutating,
 				$this->stubTreeNodeWithChildren(
-					$this->mockLeafNodeExpectingGetValue($this->any()),
-					$this->mockLeafNodeExpectingGetValue($this->any()),
-					$this->mockLeafNodeExpectingGetValue($this->any()),
+					$this->mockLeafNode(),
+					$this->mockLeafNode(),
+					$this->mockLeafNode(),
 				),
-				$this->mockLeafNodeExpectingGetValue($this->any()),
+				$this->mockLeafNode(),
 			),
-			$this->mockLeafNodeExpectingGetValue($this->any()),
+			$this->mockLeafNode(),
 		));
 		$this->assertTrue($tree->containsNode($tgt1));
 		$tree::resetCalls();
 		$this->assertTrue($tree->containsNode($tgt2));
 		$this->assertSame(0, $tree::getCalls());
+	}
+
+	public function testGetCurrentNode(): void {
+		$tree = new Tree(
+			$tgt = $this->mockLeafNode(),
+		);
+		$this->assertSame($tgt, $tree->getCurrentNode());
+	}
+
+	public function testSetCurrentNodeWithNodeInTree(): void {
+		$tree = new Tree($this->stubTreeNodeWithChildren(
+			$this->mockLeafNode(),
+			$this->stubTreeNodeWithChildren(
+				$tgt = $this->mockLeafNode(),
+			),
+			$this->mockLeafNode(),
+		));
+		$this->assertNotSame($tgt, $tree->getCurrentNode());
+		$tree->setCurrentNode($tgt);
+		$this->assertSame($tgt, $tree->getCurrentNode());
+	}
+
+	public function testSetCurrentNodeWithNodeOutsideTree(): void {
+		$tree = new Tree($this->stubTreeNodeWithChildren(
+			$this->mockLeafNode(),
+			$this->stubTreeNodeWithChildren(
+				$this->mockLeafNode(),
+			),
+			$this->mockLeafNode(),
+		));
+		$this->expectException(ValueError::class);
+		$tree->setCurrentNode($this->mockLeafNode());
 	}
 }

@@ -3,6 +3,7 @@
 namespace Computator\FrameworkUtils\PHPTemplate\RenderTree;
 
 use WeakMap;
+use ValueError;
 
 class Tree {
 	protected readonly Node $root;
@@ -49,5 +50,15 @@ class Tree {
 			}
 		});
 		return $found;
+	}
+
+	public function getCurrentNode(): Node {
+		return $this->current_node;
+	}
+
+	public function setCurrentNode(Node $node): void {
+		if (!$this->containsNode($node))
+			throw new ValueError("node not found in tree");
+		$this->current_node = $node;
 	}
 }
