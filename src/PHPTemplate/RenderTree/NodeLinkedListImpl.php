@@ -4,4 +4,4 @@ namespace Computator\FrameworkUtils\PHPTemplate\RenderTree;
 
 use SplDoublyLinkedList;
 
-class RenderableLinkedListImpl extends SplDoublyLinkedList implements RenderableLinkedList {}
+class NodeLinkedListImpl extends SplDoublyLinkedList implements NodeLinkedList {}
