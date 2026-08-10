@@ -6,7 +6,7 @@ use WeakMap;
 use ValueError;
 
 class Tree {
-	protected readonly Node $root;
+	public readonly Node $root;
 	protected Node $current_node;
 	protected WeakMap $in_tree_weakmap;
 
@@ -60,5 +60,14 @@ class Tree {
 		if (!$this->containsNode($node))
 			throw new ValueError("node not found in tree");
 		$this->current_node = $node;
+	}
+
+	public function allocateBuffer(): Buffer {
+		$buff = new Buffer();
+		if (!$this->isEmpty() && $this->current_node->isLeaf() && !$this->current_node->hasValue())
+			$this->current_node->setValue($buff);
+		else
+			$this->current_node->appendChildren(Node::withValue($buff));
+		return $buff;
 	}
 }

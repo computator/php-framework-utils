@@ -315,4 +315,70 @@ final class TreeTest extends TestCase {
 		$this->expectException(ValueError::class);
 		$tree->setCurrentNode($this->mockLeafNode());
 	}
+
+	public function testAllocateBufferWithEmptyTree(): void {
+		$set_buff = null;
+		$n = $this->mockLeafNode();
+		$n
+			->expects($this->once())
+			->method('appendChildren')
+			->willReturnCallback(function (Node ...$n) use (&$set_buff) {
+				$this->assertContainsOnlyInstancesOf(Node::class, $n);
+				$this->assertCount(1, $n);
+				$this->assertTrue($n[0]->isLeaf());
+				$set_buff = $n[0]->getValue();
+			});
+		$n
+			->expects($this->never())
+			->method('hasValue');
+		$tree = new Tree($n);
+		$alloc = $tree->allocateBuffer();
+		$this->assertSame($set_buff, $alloc);
+	}
+
+	public function testAllocateBufferWithEmptyLeafNode(): void {
+		$set_buff = null;
+		$n = $this->mockLeafNode();
+		$n
+			->expects($this->once())
+			->method('hasValue')
+			->willReturn(false);
+		$n
+			->expects($this->once())
+			->method('setValue')
+			->willReturnCallback(function ($v) use (&$set_buff) {
+				$set_buff = $v;
+				return null;
+			});
+		$tree = new Tree($this->stubTreeNodeWithChildren(
+			$n,
+		));
+		$tree->setCurrentNode($n);
+		$alloc = $tree->allocateBuffer();
+		$this->assertSame($set_buff, $alloc);
+	}
+
+	public function testAllocateBufferWithLeafNodeWithValue(): void {
+		$set_buff = null;
+		$n = $this->mockLeafNode();
+		$n
+			->expects($this->once())
+			->method('hasValue')
+			->willReturn(true);
+		$n
+			->expects($this->once())
+			->method('appendChildren')
+			->willReturnCallback(function (Node ...$n) use (&$set_buff) {
+				$this->assertContainsOnlyInstancesOf(Node::class, $n);
+				$this->assertCount(1, $n);
+				$this->assertTrue($n[0]->isLeaf());
+				$set_buff = $n[0]->getValue();
+			});
+		$tree = new Tree($this->stubTreeNodeWithChildren(
+			$n,
+		));
+		$tree->setCurrentNode($n);
+		$alloc = $tree->allocateBuffer();
+		$this->assertSame($set_buff, $alloc);
+	}
 }
