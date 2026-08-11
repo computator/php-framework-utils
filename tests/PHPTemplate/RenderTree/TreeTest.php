@@ -34,11 +34,20 @@ final class TreeTest extends TestCase {
 		return $n;
 	}
 
-	private function mockLeafNodeExpectingGetValue(InvocationOrder $order) {
+	private function mockLeafNodeExpectingGetValue(InvocationOrder $order, ?Renderable $value = null) {
 		$n = $this->mockLeafNode();
 		$n
 			->expects($order)
-			->method('getValue');
+			->method('getValue')
+			->willReturn($value);
+		return $n;
+	}
+
+	private function stubRenderableValue(String $value) {
+		$n = $this->createStub(Renderable::class);
+		$n
+			->method('render')
+			->willReturnCallback(fn (): bool => (bool) print $value);
 		return $n;
 	}
 
@@ -375,5 +384,47 @@ final class TreeTest extends TestCase {
 		));
 		$tree->setCurrentNode($n);
 		$tree->addValue($val);
+	}
+
+	public function testRender(): void {
+		$tree = new Tree($this->stubTreeNodeWithChildren(
+			$this->stubTreeNodeWithChildren(
+				$this->mockLeafNodeExpectingGetValue($this->once(), $this->stubRenderableValue("asdf1\n")),
+				$this->mockLeafNodeExpectingGetValue($this->once(), $this->stubRenderableValue("asdf2\n")),
+				$this->mockLeafNodeExpectingGetValue($this->once(), $this->stubRenderableValue("asdf3\n")),
+			),
+			$this->mockLeafNodeExpectingGetValue($this->once(), $this->stubRenderableValue("asdf4\n")),
+			$this->stubTreeNodeWithChildren(
+				$this->mockLeafNodeExpectingGetValue($this->once(), $this->stubRenderableValue("asdf5\n")),
+				$this->mockLeafNodeExpectingGetValue($this->once(), $this->stubRenderableValue("asdf6\n")),
+				$this->stubTreeNodeWithChildren(
+					$this->mockLeafNodeExpectingGetValue($this->once(), $this->stubRenderableValue("asdf7\n")),
+					$this->mockLeafNodeExpectingGetValue($this->once(), null),
+					$this->mockLeafNodeExpectingGetValue($this->once(), $this->stubRenderableValue("asdf8\n")),
+					$this->mockLeafNodeExpectingGetValue($this->once(), null),
+					$this->mockLeafNodeExpectingGetValue($this->once(), $this->stubRenderableValue("asdf9\n")),
+				),
+				$this->mockLeafNodeExpectingGetValue($this->once(), null),
+				$this->mockLeafNodeExpectingGetValue($this->once(), $this->stubRenderableValue("asdf10\n")),
+			),
+			$this->mockLeafNodeExpectingGetValue($this->once(), $this->stubRenderableValue("asdf11\n")),
+			$this->mockLeafNodeExpectingGetValue($this->once(), $this->stubRenderableValue(":")),
+		));
+		$this->expectOutputString(<<<"END"
+		asdf1
+		asdf2
+		asdf3
+		asdf4
+		asdf5
+		asdf6
+		asdf7
+		asdf8
+		asdf9
+		asdf10
+		asdf11
+		:
+		END
+		);
+		$tree->render();
 	}
 }

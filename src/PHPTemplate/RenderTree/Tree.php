@@ -68,4 +68,10 @@ class Tree {
 		else
 			$this->current_node->appendChildren(Node::withValue($value));
 	}
+
+	public function render(): void {
+		static::walk($this->root, fn ($n) =>
+			($n->isLeaf() && $n->getValue()?->render()) || true
+		);
+	}
 }

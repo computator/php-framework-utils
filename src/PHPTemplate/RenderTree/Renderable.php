@@ -2,4 +2,6 @@
 
 namespace Computator\FrameworkUtils\PHPTemplate\RenderTree;
 
-interface Renderable {}
+interface Renderable {
+	public function render(): void;
+}
