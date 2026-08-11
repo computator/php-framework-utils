@@ -3,6 +3,7 @@
 namespace Computator\FrameworkUtils\Test\PHPTemplate\RenderTree;
 
 use Computator\FrameworkUtils\PHPTemplate\RenderTree\Node;
+use Computator\FrameworkUtils\PHPTemplate\RenderTree\Renderable;
 use Computator\FrameworkUtils\PHPTemplate\RenderTree\Tree;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\Rule\InvocationOrder;
@@ -316,28 +317,27 @@ final class TreeTest extends TestCase {
 		$tree->setCurrentNode($this->mockLeafNode());
 	}
 
-	public function testAllocateBufferWithEmptyTree(): void {
-		$set_buff = null;
+	public function testAddValueWithEmptyTree(): void {
+		$val = $this->createStub(Renderable::class);
 		$n = $this->mockLeafNode();
 		$n
 			->expects($this->once())
 			->method('appendChildren')
-			->willReturnCallback(function (Node ...$n) use (&$set_buff) {
+			->willReturnCallback(function (Node ...$n) use ($val) {
 				$this->assertContainsOnlyInstancesOf(Node::class, $n);
 				$this->assertCount(1, $n);
 				$this->assertTrue($n[0]->isLeaf());
-				$set_buff = $n[0]->getValue();
+				$this->assertSame($val, $n[0]->getValue());
 			});
 		$n
 			->expects($this->never())
 			->method('hasValue');
 		$tree = new Tree($n);
-		$alloc = $tree->allocateBuffer();
-		$this->assertSame($set_buff, $alloc);
+		$tree->addValue($val);
 	}
 
-	public function testAllocateBufferWithEmptyLeafNode(): void {
-		$set_buff = null;
+	public function testAddValueWithEmptyLeafNode(): void {
+		$val = $this->createStub(Renderable::class);
 		$n = $this->mockLeafNode();
 		$n
 			->expects($this->once())
@@ -346,20 +346,16 @@ final class TreeTest extends TestCase {
 		$n
 			->expects($this->once())
 			->method('setValue')
-			->willReturnCallback(function ($v) use (&$set_buff) {
-				$set_buff = $v;
-				return null;
-			});
+			->willReturnCallback(fn ($v) => $this->assertSame($val, $v));
 		$tree = new Tree($this->stubTreeNodeWithChildren(
 			$n,
 		));
 		$tree->setCurrentNode($n);
-		$alloc = $tree->allocateBuffer();
-		$this->assertSame($set_buff, $alloc);
+		$tree->addValue($val);
 	}
 
-	public function testAllocateBufferWithLeafNodeWithValue(): void {
-		$set_buff = null;
+	public function testAddValueWithLeafNodeWithValue(): void {
+		$val = $this->createStub(Renderable::class);
 		$n = $this->mockLeafNode();
 		$n
 			->expects($this->once())
@@ -368,17 +364,16 @@ final class TreeTest extends TestCase {
 		$n
 			->expects($this->once())
 			->method('appendChildren')
-			->willReturnCallback(function (Node ...$n) use (&$set_buff) {
+			->willReturnCallback(function (Node ...$n) use ($val) {
 				$this->assertContainsOnlyInstancesOf(Node::class, $n);
 				$this->assertCount(1, $n);
 				$this->assertTrue($n[0]->isLeaf());
-				$set_buff = $n[0]->getValue();
+				$this->assertSame($val, $n[0]->getValue());
 			});
 		$tree = new Tree($this->stubTreeNodeWithChildren(
 			$n,
 		));
 		$tree->setCurrentNode($n);
-		$alloc = $tree->allocateBuffer();
-		$this->assertSame($set_buff, $alloc);
+		$tree->addValue($val);
 	}
 }

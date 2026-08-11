@@ -62,12 +62,10 @@ class Tree {
 		$this->current_node = $node;
 	}
 
-	public function allocateBuffer(): Buffer {
-		$buff = new Buffer();
+	public function addValue(Renderable $value): void {
 		if (!$this->isEmpty() && $this->current_node->isLeaf() && !$this->current_node->hasValue())
-			$this->current_node->setValue($buff);
+			$this->current_node->setValue($value);
 		else
-			$this->current_node->appendChildren(Node::withValue($buff));
-		return $buff;
+			$this->current_node->appendChildren(Node::withValue($value));
 	}
 }
