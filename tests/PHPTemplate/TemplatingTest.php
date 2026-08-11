@@ -21,17 +21,37 @@ final class TemplatingTest extends TestCase {
 	];
 
 	#[DataProvider('templatesProviderVer8_1')]
-	public function testTemplate(string $template, array $deps, string $expected): void	{
-		$this->testTemplateImpl($template, $deps, $expected);
+	public function testTemplateRender(string $template, array $deps, string $expected): void	{
+		$this->testTemplateRenderImpl($template, $deps, $expected);
 	}
 
 	#[RequiresPhp('8.5')]
 	#[DataProvider('templatesProviderVer8_5')]
-	public function testPhp85Template(string $template, array $deps, string $expected): void	{
-		$this->testTemplateImpl($template, $deps, $expected);
+	public function testPhp85TemplateRender(string $template, array $deps, string $expected): void	{
+		$this->testTemplateRenderImpl($template, $deps, $expected);
 	}
 
-	protected function testTemplateImpl(string $template, array $deps, string $expected): void {
+	#[DataProvider('templatesProviderVer8_1')]
+	public function testTemplateStringRender(string $template, array $deps, string $expected): void	{
+		$this->testTemplateRenderImpl($template, $deps, $expected);
+	}
+
+	#[RequiresPhp('8.5')]
+	#[DataProvider('templatesProviderVer8_5')]
+	public function testPhp85TemplateStringRender(string $template, array $deps, string $expected): void	{
+		$this->testTemplateRenderImpl($template, $deps, $expected);
+	}
+
+	protected function testTemplateRenderImpl(string $template, array $deps, string $expected): void {
+		$r = Renderer::create(
+			new Templates\PHPString($template),
+			new StaticTemplateResolver($deps),
+		);
+		$this->expectOutputString($expected);
+		$r->render();
+	}
+
+	protected function testTemplateStringRenderImpl(string $template, array $deps, string $expected): void {
 		$r = Renderer::create(
 			new Templates\PHPString($template),
 			new StaticTemplateResolver($deps),
