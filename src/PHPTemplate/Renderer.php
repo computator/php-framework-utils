@@ -27,7 +27,7 @@ class Renderer implements RenderManager, RenderClient {
 	protected bool $rendering_to_string;
 
 	public static function create(Templates\Base $template, TemplateResolver $resolver = new TemplateResolver()): RenderClient {
-		return new self($template, $resolver);
+		return new static($template, $resolver);
 	}
 
 	final private function __construct(Templates\Base $template, TemplateResolver $resolver) {

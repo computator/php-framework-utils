@@ -5,10 +5,9 @@ namespace Computator\FrameworkUtils\Test\PHPTemplate;
 use Computator\FrameworkUtils\PHPTemplate\Exceptions;
 use Computator\FrameworkUtils\PHPTemplate\RenderManager;
 use Computator\FrameworkUtils\PHPTemplate\RenderObjects\TemplateRenderProxy;
-use Computator\FrameworkUtils\PHPTemplate\RenderTree;
 use Computator\FrameworkUtils\PHPTemplate\Renderer;
-use Computator\FrameworkUtils\PHPTemplate\TemplateResolver;
 use Computator\FrameworkUtils\PHPTemplate\Templates;
+use Computator\FrameworkUtils\Test\PHPTemplate\TestUtils;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\TestCase;
@@ -20,11 +19,6 @@ use function ob_start;
 
 #[CoversClass(Renderer::class)]
 final class RendererTest extends TestCase {
-	private static function getRendertree(Renderer $renderer): RenderTree\Tree {
-		static $prop = new ReflectionProperty(Renderer::class, 'rendertree');
-		return $prop->getValue($renderer);
-	}
-
 	public function testRender(): void {
 		$t = $this->createStub(Templates\Base::class);
 		$t
@@ -96,19 +90,13 @@ final class RendererTest extends TestCase {
 	}
 
 	public function testGetTemplateAsProxyTemplateMatches(): void {
-		$res = new class ([
-			$t = $this->createStub(Templates\Base::class),
-			$this->createStub(Templates\Base::class),
-		]) extends TemplateResolver {
-			public function __construct(
-				protected $tpls,
-			) {}
-			protected function map(string $template): Templates\Base {
-				return array_shift($this->tpls);
-			}
-		};
 		/** @var RenderManager $r */
-		$r = Renderer::create($this->createStub(Templates\Base::class), $res);
+		$r = Renderer::create($this->createStub(Templates\Base::class),
+			new TestUtils\QueueTemplateResolver(
+				$t = $this->createStub(Templates\Base::class),
+				$this->createStub(Templates\Base::class),
+			),
+		);
 		$p = $r->getTemplateAsProxy('test_tpl');
 
 		$tpl_prop = new ReflectionProperty(TemplateRenderProxy::class, 'tpl');
@@ -116,19 +104,13 @@ final class RendererTest extends TestCase {
 	}
 
 	public function testGetTemplateAsProxyReturnsUnique(): void {
-		$res = new class ([
-			$this->createStub(Templates\Base::class),
-			$this->createStub(Templates\Base::class),
-		]) extends TemplateResolver {
-			public function __construct(
-				protected $tpls,
-			) {}
-			protected function map(string $template): Templates\Base {
-				return array_shift($this->tpls);
-			}
-		};
 		/** @var RenderManager $r */
-		$r = Renderer::create($this->createStub(Templates\Base::class), $res);
+		$r = Renderer::create($this->createStub(Templates\Base::class),
+			new TestUtils\QueueTemplateResolver(
+				$this->createStub(Templates\Base::class),
+				$this->createStub(Templates\Base::class),
+			),
+		);
 		$p1 = $r->getTemplateAsProxy('test_tpl');
 		$p2 = $r->getTemplateAsProxy('test_tpl');
 		$this->assertNotSame($p1, $p2);
@@ -138,19 +120,13 @@ final class RendererTest extends TestCase {
 	}
 
 	public function testGetTemplateInstanceAsProxyByIdWithExistingId(): void {
-		$res = new class ([
-			$t = $this->createStub(Templates\Base::class),
-			$this->createStub(Templates\Base::class),
-		]) extends TemplateResolver {
-			public function __construct(
-				protected $tpls,
-			) {}
-			protected function map(string $template): Templates\Base {
-				return array_shift($this->tpls);
-			}
-		};
 		/** @var RenderManager $r */
-		$r = Renderer::create($this->createStub(Templates\Base::class), $res);
+		$r = Renderer::create($this->createStub(Templates\Base::class),
+			new TestUtils\QueueTemplateResolver(
+				$t = $this->createStub(Templates\Base::class),
+				$this->createStub(Templates\Base::class),
+			),
+		);
 		$p1 = $r->getTemplateAsProxy('test_tpl');
 		$p2 = $r->getTemplateInstanceAsProxyById($p1->id);
 		$this->assertNotSame($p1, $p2);
@@ -168,82 +144,64 @@ final class RendererTest extends TestCase {
 	}
 
 	public function testRenderChild(): void {
-		$res = new class ([
-			$t = $this->createStub(Templates\Base::class),
-		]) extends TemplateResolver {
-			public function __construct(
-				protected $tpls,
-			) {}
-			protected function map(string $template): Templates\Base {
-				return array_shift($this->tpls);
-			}
-		};
+		/** @var RenderManager|TestUtils\VisibleRenderer $r */
+		$r = TestUtils\VisibleRenderer::create($this->createStub(Templates\Base::class),
+			new TestUtils\QueueTemplateResolver(
+				$t = $this->createStub(Templates\Base::class),
+			),
+		);
 		$t
 			->method('execute')
 			->willReturnCallback(function (...$args): void {
 				echo 'asdf';
 			});
-		/** @var RenderManager $r */
-		$r = Renderer::create($this->createStub(Templates\Base::class), $res);
 
 		$p = $r->getTemplateAsProxy('test_tpl');
 		$this->assertSame($t, (new ReflectionProperty(TemplateRenderProxy::class, 'tpl'))->getValue($p));
 
 		$r->renderChild($p);
 		$this->expectOutputString('asdf');
-		self::getRendertree($r)->render();
+		$r->rendertree->render();
 	}
 
 	public function testRenderErrorWithStringTemplate(): void {
-		/** @var RenderManager $r */
-		$r = Renderer::create($this->createStub(Templates\Base::class));
+		/** @var RenderManager|TestUtils\VisibleRenderer $r */
+		$r = TestUtils\VisibleRenderer::create($this->createStub(Templates\Base::class));
 		$e = new Templates\Text('asdf');
 
 		$r->renderError($e);
 		$this->expectOutputString('asdf');
-		self::getRendertree($r)->render();
+		$r->rendertree->render();
 	}
 
 	public function testRenderErrorWithString(): void {
-		/** @var RenderManager $r */
-		$r = Renderer::create($this->createStub(Templates\Base::class));
+		/** @var RenderManager|TestUtils\VisibleRenderer $r */
+		$r = TestUtils\VisibleRenderer::create($this->createStub(Templates\Base::class));
 
 		$r->renderError('asdf');
 		$this->expectOutputString('asdf');
-		self::getRendertree($r)->render();
+		$r->rendertree->render();
 	}
 
 	#[DoesNotPerformAssertions]
 	public function testSetParentForTemplate(): void {
-		$res = new class ([
-			$this->createStub(Templates\Base::class),
-		]) extends TemplateResolver {
-			public function __construct(
-				protected $tpls,
-			) {}
-			protected function map(string $template): Templates\Base {
-				return array_shift($this->tpls);
-			}
-		};
 		/** @var RenderManager $r */
-		$r = Renderer::create($this->createStub(Templates\Base::class), $res);
+		$r = Renderer::create($this->createStub(Templates\Base::class),
+			new TestUtils\QueueTemplateResolver(
+				$this->createStub(Templates\Base::class),
+			),
+		);
 		$r->setParentForTemplate($this->createStub(Templates\Base::class), 'asdf');
 	}
 
 	public function testSetParentForTemplateTwiceThrows(): void {
-		$res = new class ([
-			$this->createStub(Templates\Base::class),
-		]) extends TemplateResolver {
-			public function __construct(
-				protected $tpls,
-			) {}
-			protected function map(string $template): Templates\Base {
-				return array_shift($this->tpls);
-			}
-		};
-		$t = $this->createStub(Templates\Base::class);
 		/** @var RenderManager $r */
-		$r = Renderer::create($this->createStub(Templates\Base::class), $res);
+		$r = Renderer::create($this->createStub(Templates\Base::class),
+			new TestUtils\QueueTemplateResolver(
+				$this->createStub(Templates\Base::class),
+			),
+		);
+		$t = $this->createStub(Templates\Base::class);
 		$r->setParentForTemplate($t, 'asdf');
 		$this->expectException(Exceptions\RendererException::class);
 		$r->setParentForTemplate($t, 'asdf');

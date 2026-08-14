@@ -5,6 +5,7 @@ namespace Computator\FrameworkUtils\Test\PHPTemplate\RenderTree;
 use Computator\FrameworkUtils\PHPTemplate\RenderTree\Node;
 use Computator\FrameworkUtils\PHPTemplate\RenderTree\Renderable;
 use Computator\FrameworkUtils\PHPTemplate\RenderTree\Tree;
+use Computator\FrameworkUtils\Test\PHPTemplate\TestUtils;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\Rule\InvocationOrder;
 use PHPUnit\Framework\TestCase;
@@ -162,7 +163,7 @@ final class TreeTest extends TestCase {
 	}
 
 	public function testContainsNodeWithExistingInOriginalTreeSkipsWalk(): void {
-		$tree = new WalkCountingTree($this->stubTreeNodeWithChildren(
+		$tree = new TestUtils\WalkCountingTree($this->stubTreeNodeWithChildren(
 			$this->stubTreeNodeWithChildren(
 				$this->mockLeafNode(),
 				$this->mockLeafNode(),
@@ -187,7 +188,7 @@ final class TreeTest extends TestCase {
 	}
 
 	public function testContainsNodeWithMissingInOriginalTreeWalks(): void {
-		$tree = new WalkCountingTree($this->stubTreeNodeWithChildren(
+		$tree = new TestUtils\WalkCountingTree($this->stubTreeNodeWithChildren(
 			$this->stubTreeNodeWithChildren(
 				$this->mockLeafNode(),
 				$this->mockLeafNode(),
@@ -228,7 +229,7 @@ final class TreeTest extends TestCase {
 				$this->mockLeafNode(),
 			]));
 
-		$tree = new WalkCountingTree($this->stubTreeNodeWithChildren(
+		$tree = new TestUtils\WalkCountingTree($this->stubTreeNodeWithChildren(
 			$this->stubTreeNodeWithChildren(
 				$this->mockLeafNode(),
 				$this->mockLeafNode(),
@@ -269,7 +270,7 @@ final class TreeTest extends TestCase {
 				$this->mockLeafNode(),
 			]));
 
-		$tree = new WalkCountingTree($this->stubTreeNodeWithChildren(
+		$tree = new TestUtils\WalkCountingTree($this->stubTreeNodeWithChildren(
 			$this->stubTreeNodeWithChildren(
 				$this->mockLeafNode(),
 				$this->mockLeafNode(),

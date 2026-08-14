@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Computator\FrameworkUtils\Test\PHPTemplate\RenderTree;
+namespace Computator\FrameworkUtils\Test\PHPTemplate\TestUtils;
 
 use Computator\FrameworkUtils\PHPTemplate\RenderTree\Node;
 use Computator\FrameworkUtils\PHPTemplate\RenderTree\Tree;
