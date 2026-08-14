@@ -2,24 +2,29 @@
 
 namespace Computator\FrameworkUtils\Test\PHPTemplate;
 
-use Computator\FrameworkUtils\PHPTemplate\Exceptions\RendererException;
-use Exception;
-use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
-use ReflectionProperty;
-
 use Computator\FrameworkUtils\PHPTemplate\Exceptions;
-use Computator\FrameworkUtils\PHPTemplate\Renderer;
 use Computator\FrameworkUtils\PHPTemplate\RenderManager;
 use Computator\FrameworkUtils\PHPTemplate\RenderObjects\TemplateRenderProxy;
-use Computator\FrameworkUtils\PHPTemplate\Templates;
+use Computator\FrameworkUtils\PHPTemplate\RenderTree;
+use Computator\FrameworkUtils\PHPTemplate\Renderer;
 use Computator\FrameworkUtils\PHPTemplate\TemplateResolver;
+use Computator\FrameworkUtils\PHPTemplate\Templates;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\TestCase;
+
+use Exception;
+use ReflectionProperty;
 
 use function ob_start;
 
 #[CoversClass(Renderer::class)]
 final class RendererTest extends TestCase {
+	private static function getRendertree(Renderer $renderer): RenderTree\Tree {
+		static $prop = new ReflectionProperty(Renderer::class, 'rendertree');
+		return $prop->getValue($renderer);
+	}
+
 	public function testRender(): void {
 		$t = $this->createStub(Templates\Base::class);
 		$t
@@ -180,13 +185,13 @@ final class RendererTest extends TestCase {
 			});
 		/** @var RenderManager $r */
 		$r = Renderer::create($this->createStub(Templates\Base::class), $res);
+
 		$p = $r->getTemplateAsProxy('test_tpl');
+		$this->assertSame($t, (new ReflectionProperty(TemplateRenderProxy::class, 'tpl'))->getValue($p));
 
-		$tpl_prop = new ReflectionProperty(TemplateRenderProxy::class, 'tpl');
-		$this->assertSame($t, $tpl_prop->getValue($p));
-
-		$this->expectOutputString('asdf');
 		$r->renderChild($p);
+		$this->expectOutputString('asdf');
+		self::getRendertree($r)->render();
 	}
 
 	public function testRenderErrorWithStringTemplate(): void {
@@ -194,16 +199,18 @@ final class RendererTest extends TestCase {
 		$r = Renderer::create($this->createStub(Templates\Base::class));
 		$e = new Templates\Text('asdf');
 
-		$this->expectOutputString('asdf');
 		$r->renderError($e);
+		$this->expectOutputString('asdf');
+		self::getRendertree($r)->render();
 	}
 
 	public function testRenderErrorWithString(): void {
 		/** @var RenderManager $r */
 		$r = Renderer::create($this->createStub(Templates\Base::class));
 
-		$this->expectOutputString('asdf');
 		$r->renderError('asdf');
+		$this->expectOutputString('asdf');
+		self::getRendertree($r)->render();
 	}
 
 	#[DoesNotPerformAssertions]
