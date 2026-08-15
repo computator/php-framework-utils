@@ -2,7 +2,10 @@
 
 namespace Computator\FrameworkUtils\PHPTemplate\RenderTree;
 
-class Buffer implements Renderable {
+use JsonSerializable;
+use Stringable;
+
+class Buffer implements Renderable, Stringable, JsonSerializable {
 	public function __construct(
 		protected string $value = '',
 	) {}
@@ -17,5 +20,13 @@ class Buffer implements Renderable {
 
 	public function render(): void {
 		echo $this->value;
+	}
+
+	public function __toString(): string {
+		return $this->getContents();
+	}
+
+	public function jsonSerialize(): mixed {
+		return $this->getContents();
 	}
 }

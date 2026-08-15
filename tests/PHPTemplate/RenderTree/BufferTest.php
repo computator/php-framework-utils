@@ -27,4 +27,14 @@ final class BufferTest extends TestCase {
 		$this->expectOutputString('asdf');
 		$b->render();
 	}
+
+	public function testStringable(): void {
+		$b = new Buffer('asdf');
+		$this->assertSame('asdf', (string) $b);
+	}
+
+	public function testJsonSerializable(): void {
+		$b = new Buffer('asdf');
+		$this->assertJsonStringEqualsJsonString('"asdf"', json_encode($b));
+	}
 }
