@@ -134,6 +134,31 @@ final class NodeTest extends TestCase {
 		$this->assertCount(4, $n);
 	}
 
+	public function testPopChildWithSingleChild(): void {
+		$n = Node::withChildren(
+			$c = $this->createStub(Node::class),
+		);
+		$this->assertSame($c, $n->popChild());
+		$this->assertTrue($n->isLeaf());
+		$this->assertFalse($n->hasValue());
+	}
+
+	public function testPopChildWithChildren(): void {
+		$n = Node::withChildren(
+			$c1 = $this->createStub(Node::class),
+			$c2 = $this->createStub(Node::class),
+		);
+		$this->assertSame($c2, $n->popChild());
+		$this->assertFalse($n->isLeaf());
+		$this->assertSame([$c1], [...$n]);
+	}
+
+	public function testPopChildOnLeafNode(): void {
+		$n = Node::withValue(null);
+		$this->expectException(LogicException::class);
+		$n->popChild();
+	}
+
 	public function testIteratorAggregate(): void {
 		$n = Node::withValue(null);
 		$n->appendChildren(

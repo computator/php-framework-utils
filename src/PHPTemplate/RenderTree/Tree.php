@@ -69,6 +69,19 @@ class Tree {
 		$this->current_node = $node;
 	}
 
+	public function addNode(?Node $node = null): Node {
+		if ($node === null)
+			$node = Node::withValue(null);
+		elseif ($this->containsNode($node))
+			throw new ValueError("node cannot be added to tree in more than one place");
+		$this->current_node->appendChildren($node);
+		if (!$node->isLeaf())
+			static::walk($node, fn($n) => $this->in_tree_weakmap[$n] = true);
+		else
+			$this->in_tree_weakmap[$node] = true;
+		return $node;
+	}
+
 	public function addValue(Renderable $value): void {
 		if (!$this->isEmpty() && $this->current_node->isLeaf() && !$this->current_node->hasValue())
 			$this->current_node->setValue($value);

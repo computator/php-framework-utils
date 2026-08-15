@@ -372,6 +372,57 @@ final class TreeTest extends TestCase {
 		$tree->setCurrentNode($this->mockLeafNode());
 	}
 
+	public function testAddNodeWithDefault(): void {
+		$tree = new TestUtils\WalkCountingTree(Node::withChildren(
+			$l1 = $this->mockLeafNode(),
+		));
+		$l2 = $tree->addNode();
+		$this->assertInstanceOf(Node::class, $l2);
+		$this->assertTrue($l2->isLeaf());
+		$this->assertFalse($l2->hasValue());
+		$tree::resetCalls();
+		$this->assertTrue($tree->containsNode($l2));
+		$this->assertSame(0, $tree::getCalls());
+		$this->assertSame([$l1, $l2], [...$tree->root]);
+	}
+
+	public function testAddNodeWithLeafNode(): void {
+		$tree = new TestUtils\WalkCountingTree(Node::withChildren(
+			$l1 = $this->mockLeafNode(),
+		));
+		$newleaf = $this->mockLeafNode();
+		$l2 = $tree->addNode($newleaf);
+		$this->assertSame($newleaf, $l2);
+		$tree::resetCalls();
+		$this->assertTrue($tree->containsNode($l2));
+		$this->assertSame(0, $tree::getCalls());
+		$this->assertSame([$l1, $l2], [...$tree->root]);
+	}
+
+	public function testAddNodeWithTreeNode(): void {
+		$tree = new TestUtils\WalkCountingTree(Node::withChildren(
+			$l1 = $this->mockLeafNode(),
+		));
+		$newnode = $this->stubTreeNodeWithChildren(
+			$c = $this->mockLeafNode(),
+		);
+		$l2 = $tree->addNode($newnode);
+		$this->assertSame($newnode, $l2);
+		$tree::resetCalls();
+		$this->assertTrue($tree->containsNode($l2));
+		$this->assertTrue($tree->containsNode($c));
+		$this->assertSame(0, $tree::getCalls());
+		$this->assertSame([$l1, $l2], [...$tree->root]);
+	}
+
+	public function testAddNodeWithNodeAlreadyInTree(): void {
+		$tree = new TestUtils\WalkCountingTree(Node::withChildren(
+			$l = $this->mockLeafNode(),
+		));
+		$this->expectException(ValueError::class);
+		$tree->addNode($l);
+	}
+
 	public function testAddValueWithEmptyTree(): void {
 		$val = $this->createStub(Renderable::class);
 		$n = $this->mockLeafNode();

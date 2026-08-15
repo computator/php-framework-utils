@@ -73,6 +73,13 @@ class Node implements IteratorAggregate {
 		array_walk($nodes, fn ($c) => $this->children->push($c));
 	}
 
+	// TODO: somehow notify tree that child was removed
+	public function popChild(): self {
+		if ($this->isLeaf())
+			throw new LogicException(__METHOD__." is only valid on tree nodes");
+		return $this->children->pop();
+	}
+
 	/** @codeCoverageIgnore */
 	public function __debugInfo(): array {
 		if ($this->isLeaf()) {
