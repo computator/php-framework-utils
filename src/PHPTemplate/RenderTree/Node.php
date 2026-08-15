@@ -72,4 +72,17 @@ class Node implements IteratorAggregate {
 			$this->transform();
 		array_walk($nodes, fn ($c) => $this->children->push($c));
 	}
+
+	/** @codeCoverageIgnore */
+	public function __debugInfo(): array {
+		if ($this->isLeaf()) {
+			return [
+				'value' => $this->getValue(),
+			];
+		} else {
+			return [
+				'children' => [...$this],
+			];
+		}
+	}
 }

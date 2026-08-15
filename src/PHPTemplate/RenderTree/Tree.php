@@ -26,6 +26,13 @@ class Tree {
 		return true;
 	}
 
+	/** @return array<array|Renderable|Null>|Renderable|null */
+	public static function map_structure(Node $start): array|Renderable|null {
+		if ($start->isLeaf())
+			return $start->getValue();
+		return array_map(static::map_structure(...), [...$start]);
+	}
+
 	public function __construct(Node $root_node) {
 		$this->root = $root_node;
 		$this->current_node = $this->root;

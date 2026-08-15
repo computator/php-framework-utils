@@ -10,7 +10,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 use ArgumentCountError;
-use function PHPUnit\Framework\assertNull;
 
 #[CoversClass(Node::class)]
 final class NodeTest extends TestCase {

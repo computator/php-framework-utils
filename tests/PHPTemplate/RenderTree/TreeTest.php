@@ -142,6 +142,51 @@ final class TreeTest extends TestCase {
 		);
 	}
 
+	public function testMapStructureMatchesStucture(): void {
+		$tree = $this->stubTreeNodeWithChildren(
+			$this->stubTreeNodeWithChildren(
+				$this->mockLeafNodeExpectingGetValue($this->once(), $v1 = $this->createStub(Renderable::class)),
+				$this->mockLeafNodeExpectingGetValue($this->once(), $v2 = $this->createStub(Renderable::class)),
+				$this->mockLeafNodeExpectingGetValue($this->once(), $v3 = $this->createStub(Renderable::class)),
+			),
+			$this->mockLeafNodeExpectingGetValue($this->once(), $v4 = $this->createStub(Renderable::class)),
+			$this->stubTreeNodeWithChildren(
+				$this->mockLeafNodeExpectingGetValue($this->once(), $v5 = $this->createStub(Renderable::class)),
+				$this->mockLeafNodeExpectingGetValue($this->once(), $v6 = $this->createStub(Renderable::class)),
+				$this->stubTreeNodeWithChildren(
+					$this->mockLeafNodeExpectingGetValue($this->once(), $v7 = $this->createStub(Renderable::class)),
+					$this->mockLeafNodeExpectingGetValue($this->once(), $v8 = $this->createStub(Renderable::class)),
+					$this->mockLeafNodeExpectingGetValue($this->once(), $v9 = $this->createStub(Renderable::class)),
+				),
+				$this->mockLeafNodeExpectingGetValue($this->once(), $v10 = $this->createStub(Renderable::class)),
+			),
+			$this->mockLeafNodeExpectingGetValue($this->once(), $v11 = $this->createStub(Renderable::class)),
+		);
+
+		$this->assertSame(
+			[
+				[
+					$v1,
+					$v2,
+					$v3,
+				],
+				$v4,
+				[
+					$v5,
+					$v6,
+					[
+						$v7,
+						$v8,
+						$v9,
+					],
+					$v10,
+				],
+				$v11,
+			],
+			Tree::map_structure($tree),
+		);
+	}
+
 	public function testIsEmptyWithLeaf(): void {
 		$n = $this->createMock(Node::class);
 		$n
