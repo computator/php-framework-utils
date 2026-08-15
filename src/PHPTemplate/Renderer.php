@@ -145,7 +145,16 @@ class Renderer implements RenderManager, RenderClient {
 	}
 
 	public function renderChild(RenderObjects\TemplateRenderProxy $proxy): void {
+		$prev = $this->rendertree->getCurrentNode();
+		$new_node = $this->rendertree->addNode();
+		$this->rendertree->setCurrentNode($new_node);
 		$this->do_render($this->tpl_proxy_map[$proxy->id]);
+		$this->rendertree->setCurrentNode($prev);
+		// if rendering is nested the final buffer node
+		// needs to be shifted back to the parent node
+		if ($this->current_buff !== null) {
+			$prev->appendChildren($new_node->popChild());
+		}
 	}
 
 	public function renderError(Templates\PHPString|Templates\Text|string $error): void {
