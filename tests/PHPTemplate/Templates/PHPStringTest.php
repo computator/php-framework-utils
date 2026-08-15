@@ -55,4 +55,17 @@ final class PHPStringTest extends TestCase {
 		);
 		$this->assertEquals('', $rv);
 	}
+
+	public function testVerifyUsesTemplateRuntimeController(): void {
+		$t = new Templates\PHPString(<<<'TPL'
+			<?php
+			return $this::class;
+			TPL
+		);
+		$rv = $t->execute(
+			[],
+			...TemplateRuntimeController::getConstructorTestArgs($this),
+		);
+		$this->assertEquals(TemplateRuntimeController::class, $rv);
+	}
 }

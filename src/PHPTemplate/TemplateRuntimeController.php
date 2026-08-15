@@ -8,8 +8,6 @@ use ReflectionMethod;
 
 class TemplateRuntimeController {
 
-	use ExecInClass;
-
 	public static function getConstructorTestArgs(\PHPUnit\Framework\TestCase $tc): array {
 		$tc_createStub = new ReflectionMethod($tc::class, 'createStub');
 		return [

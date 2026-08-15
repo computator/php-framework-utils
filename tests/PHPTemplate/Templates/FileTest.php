@@ -98,4 +98,24 @@ final class FileTest extends TestCase {
 
 		fclose($fd);
 	}
+
+	public function testVerifyUsesTemplateRuntimeController(): void {
+		$fd = tmpfile();
+		['uri' => $path] = stream_get_meta_data($fd);
+
+		fwrite($fd, <<<'TPL'
+			<?php
+			return $this::class;
+			TPL
+		);
+
+		$t = new Templates\File($path);
+		$rv = $t->execute(
+			[],
+			...TemplateRuntimeController::getConstructorTestArgs($this),
+		);
+		$this->assertEquals(TemplateRuntimeController::class, $rv);
+
+		fclose($fd);
+	}
 }

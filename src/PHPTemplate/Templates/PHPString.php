@@ -17,14 +17,11 @@ class PHPString extends Base {
 
 	public function execute(array $context, mixed ...$controller_args): mixed {
 		$rc = new TemplateRuntimeController(...$controller_args);
-		return $rc->__execInClass(
-			function () {
-				extract($this->__exec_data['context']);
-				unset($this->__exec_data['context']);
-				// ending tag added to switch to HTML mode instead of starting in PHP mode
-				return eval("?>{$this->__exec_data['content']}");
-			},
-			['context' => $context, 'content' => $this->content],
-		);
+		return (function (...$__exec_args) {
+			extract($__exec_args['context']);
+			unset($__exec_args['context']);
+			// ending tag added to switch to HTML mode instead of starting in PHP mode
+			return eval("?>{$__exec_args['content']}");
+		})->call($rc, context: $context, content: $this->content);
 	}
 }
