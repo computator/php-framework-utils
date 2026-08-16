@@ -142,6 +142,37 @@ final class TreeTest extends TestCase {
 		);
 	}
 
+	public function testWalkFilterSkipsSubtree(): void {
+		$tree = $this->stubTreeNodeWithChildren(
+			$this->stubTreeNodeWithChildren(
+				$this->mockLeafNodeExpectingGetValue($this->once()),
+				$this->mockLeafNodeExpectingGetValue($this->once()),
+				$this->mockLeafNodeExpectingGetValue($this->once()),
+			),
+			$this->mockLeafNodeExpectingGetValue($this->once()),
+			$this->stubTreeNodeWithChildren(
+				$this->mockLeafNodeExpectingGetValue($this->once()),
+				$this->mockLeafNodeExpectingGetValue($this->once()),
+				$subtree = $this->stubTreeNodeWithChildren(
+					$this->mockLeafNodeExpectingGetValue($this->never()),
+					$this->stubTreeNodeWithChildren(
+						$this->mockLeafNodeExpectingGetValue($this->never()),
+						$this->mockLeafNodeExpectingGetValue($this->never()),
+					),
+					$this->mockLeafNodeExpectingGetValue($this->never()),
+					$this->mockLeafNodeExpectingGetValue($this->never()),
+				),
+				$this->mockLeafNodeExpectingGetValue($this->once()),
+			),
+			$this->mockLeafNodeExpectingGetValue($this->once()),
+		);
+
+		Tree::walk($tree,
+			fn (Node $n) => $n->isLeaf() ? $n->getValue() === null : true,
+			fn (Node $n) => $n !== $subtree,
+		);
+	}
+
 	public function testMapStructureMatchesStucture(): void {
 		$tree = $this->stubTreeNodeWithChildren(
 			$this->stubTreeNodeWithChildren(

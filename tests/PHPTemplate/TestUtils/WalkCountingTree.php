@@ -9,12 +9,12 @@ class WalkCountingTree extends Tree {
 	private static int $walk_calls = 0;
 	private static bool $walking = false;
 
-	public static function walk(Node $start, callable $callback): bool {
+	public static function walk(Node $start, callable $callback, ?callable $filter = null): bool {
 		if (self::$walking)
-			return parent::walk($start, $callback);
+			return parent::walk($start, $callback, $filter);
 		self::$walk_calls++;
 		self::$walking = true;
-		$rv = parent::walk($start, $callback);
+		$rv = parent::walk($start, $callback, $filter);
 		self::$walking = false;
 		return $rv;
 	}

@@ -13,13 +13,19 @@ class Tree {
 	/**
 	 * @param callable(Node $node): mixed|false $callback
 	 *     return false from the callback to abort walking the rest of the tree
+	 * @param ?callable(Node $node): bool $filter
+	 *     return false from the optional filter callback to skip the node and it's children
 	 */
-	public static function walk(Node $start, callable $callback): bool {
+	public static function walk(Node $start, callable $callback, ?callable $filter = null): bool {
+		if ($filter && !$filter($start))
+			return true;
 		if ($callback($start) === false)
 			return false;
 		if (!$start->isLeaf()) {
 			foreach ($start as $n) {
-				if (static::walk($n, $callback) === false)
+				if ($filter && !$filter($start))
+					continue;
+				if (static::walk($n, $callback, $filter) === false)
 					return false;
 			}
 		}
