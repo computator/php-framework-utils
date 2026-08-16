@@ -94,4 +94,90 @@ final class TemplateRuntimeControllerTest extends TestCase {
 			$t,
 		))->inherit('test_tpl');
 	}
+
+	public function testDefineSuccess(): void {
+		$r = $this->createMock(RenderManager::class);
+		$t = $this->createMock(Templates\Base::class);
+		$r
+			->expects($this->once())
+			->method('startRenderingBlock')
+			->with($t, 'test_block');
+		(new TemplateRuntimeController(
+			$r,
+			$t,
+		))->define('test_block');
+	}
+
+	public function testDefineInvalidState(): void {
+		$r = $this->createMock(RenderManager::class);
+		$t = $this->createMock(Templates\Base::class);
+		$r
+			->expects($this->once())
+			->method('startRenderingBlock')
+			->with($t, 'test_block')
+			->willThrowException(new Exceptions\RendererStateException());
+		$this->expectException(Exceptions\TemplateLogicException::class);
+		(new TemplateRuntimeController(
+			$r,
+			$t,
+		))->define('test_block');
+	}
+
+	public function testDefineFailure(): void {
+		$r = $this->createMock(RenderManager::class);
+		$t = $this->createMock(Templates\Base::class);
+		$r
+			->expects($this->once())
+			->method('startRenderingBlock')
+			->with($t, 'test_block')
+			->willThrowException(new Exceptions\RendererException());
+		$this->expectException(Exceptions\TemplateRenderException::class);
+		(new TemplateRuntimeController(
+			$r,
+			$t,
+		))->define('test_block');
+	}
+
+	public function testDefineEndSuccess(): void {
+		$r = $this->createMock(RenderManager::class);
+		$t = $this->createMock(Templates\Base::class);
+		$r
+			->expects($this->once())
+			->method('endRenderingBlock')
+			->with($t);
+		(new TemplateRuntimeController(
+			$r,
+			$t,
+		))->define_end();
+	}
+
+	public function testDefineEndInvalidState(): void {
+		$r = $this->createMock(RenderManager::class);
+		$t = $this->createMock(Templates\Base::class);
+		$r
+			->expects($this->once())
+			->method('endRenderingBlock')
+			->with($t)
+			->willThrowException(new Exceptions\RendererStateException());
+		$this->expectException(Exceptions\TemplateLogicException::class);
+		(new TemplateRuntimeController(
+			$r,
+			$t,
+		))->define_end();
+	}
+
+	public function testDefineEndFailure(): void {
+		$r = $this->createMock(RenderManager::class);
+		$t = $this->createMock(Templates\Base::class);
+		$r
+			->expects($this->once())
+			->method('endRenderingBlock')
+			->with($t)
+			->willThrowException(new Exceptions\RendererException());
+		$this->expectException(Exceptions\TemplateRenderException::class);
+		(new TemplateRuntimeController(
+			$r,
+			$t,
+		))->define_end();
+	}
 }

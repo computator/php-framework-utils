@@ -38,4 +38,24 @@ class TemplateRuntimeController {
 			throw new Exceptions\TemplateRenderException("renderer error: $e", previous: $e);
 		}
 	}
+
+	public function define(string $block_name): void {
+		try {
+			$this->renderer->startRenderingBlock($this->template, $block_name);
+		} catch (Exceptions\RendererStateException $e) {
+			throw new Exceptions\TemplateLogicException("can't start a new block definition: $e", previous: $e);
+		} catch (Exceptions\RendererException $e) {
+			throw new Exceptions\TemplateRenderException("renderer error: $e", previous: $e);
+		}
+	}
+
+	public function define_end(): void {
+		try {
+			$this->renderer->endRenderingBlock($this->template);
+		} catch (Exceptions\RendererStateException $e) {
+			throw new Exceptions\TemplateLogicException("can't end the current block: $e", previous: $e);
+		} catch (Exceptions\RendererException $e) {
+			throw new Exceptions\TemplateRenderException("renderer error: $e", previous: $e);
+		}
+	}
 }
