@@ -32,8 +32,10 @@ class TemplateRuntimeController {
 	public function inherit(string $parent_template): void {
 		try {
 			$this->renderer->setParentForTemplate($this->template, $parent_template);
+		} catch (Exceptions\RendererStateException $e) {
+			throw new Exceptions\TemplateLogicException("inherit can not be called more than once", previous: $e);
 		} catch (Exceptions\RendererException $e) {
-			throw new Exceptions\TemplateRenderException("inherit can not be called more than once", previous: $e);
+			throw new Exceptions\TemplateRenderException("renderer error: $e", previous: $e);
 		}
 	}
 }

@@ -65,6 +65,21 @@ final class TemplateRuntimeControllerTest extends TestCase {
 		))->inherit('test_tpl');
 	}
 
+	public function testInheritInvalidState(): void {
+		$r = $this->createMock(RenderManager::class);
+		$t = $this->createMock(Templates\Base::class);
+		$r
+			->expects($this->once())
+			->method('setParentForTemplate')
+			->with($t, 'test_tpl')
+			->willThrowException(new Exceptions\RendererStateException());
+		$this->expectException(Exceptions\TemplateLogicException::class);
+		(new TemplateRuntimeController(
+			$r,
+			$t,
+		))->inherit('test_tpl');
+	}
+
 	public function testInheritFailure(): void {
 		$r = $this->createMock(RenderManager::class);
 		$t = $this->createMock(Templates\Base::class);

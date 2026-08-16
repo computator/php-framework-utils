@@ -171,7 +171,7 @@ class Renderer implements RenderManager, RenderClient {
 
 	public function setParentForTemplate(Templates\Base $tpl, string $parent_template): void {
 		if (isset($this->tpl_state($tpl)->parent))
-			throw new Exceptions\RendererException("invalid state: template already has an associated parent");
+			throw new Exceptions\RendererStateException("template already has an associated parent");
 		$this->tpl_state($tpl)->parent = $this->resolver->resolve($parent_template);
 	}
 }
