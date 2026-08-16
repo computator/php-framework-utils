@@ -80,13 +80,24 @@ class Renderer implements RenderManager, RenderClient {
 		);
 	}
 
+	protected function swap_to_new_buffer(): bool {
+		if ($was_buffering = $this->current_buff !== null)
+			$this->current_buff->append(ob_get_clean());
+		$this->current_buff = new RenderTree\Buffer();
+		$this->rendertree->addValue($this->current_buff);
+		ob_start();
+		return $was_buffering;
+	}
+
+	protected function complete_buffer(): void {
+		assert($this->current_buff !== null);
+		$this->current_buff->append(ob_get_clean());
+		$this->current_buff = null;
+	}
+
 	protected function do_render(Templates\Base $tpl): void {
 		if ($this->using_tree) {
-			if ($was_buffering = $this->current_buff !== null)
-				$this->current_buff->append(ob_get_clean());
-			$this->current_buff = new RenderTree\Buffer();
-			$this->rendertree->addValue($this->current_buff);
-			ob_start();
+			$was_buffering = $this->swap_to_new_buffer();
 		}
 		$start_ob_level = ob_get_level();
 		$error = null;
@@ -115,14 +126,9 @@ class Renderer implements RenderManager, RenderClient {
 		}
 
 		if ($this->using_tree) {
-			$this->current_buff->append(ob_get_clean());
-			if ($was_buffering) {
-				$this->current_buff = new RenderTree\Buffer();
-				$this->rendertree->addValue($this->current_buff);
-				ob_start();
-			}
-			else
-				$this->current_buff = null;
+			$this->complete_buffer();
+			if ($was_buffering)
+				$this->swap_to_new_buffer();
 		}
 
 		if ($error)
