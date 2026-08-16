@@ -6,6 +6,7 @@ use Computator\FrameworkUtils\PHPTemplate\Exceptions;
 use Computator\FrameworkUtils\PHPTemplate\RenderTree;
 use Computator\FrameworkUtils\PHPTemplate\Templates;
 
+use ArrayAccess;
 use SplObjectStorage;
 use Throwable;
 
@@ -16,7 +17,8 @@ use function ob_get_level,ob_end_flush;
 class Renderer implements RenderManager, RenderClient {
 	protected readonly Templates\Base $root_template;
 	protected readonly TemplateResolver $resolver;
-	protected SplObjectStorage $tpl_parent_map;
+	/** @var ArrayAccess<Templates\Base,RendererTemplateState> $tpl_state_map */
+	protected SplObjectStorage $tpl_state_map;
 	protected array $tpl_proxy_map = [];
 
 	protected readonly bool $using_tree;
@@ -34,7 +36,7 @@ class Renderer implements RenderManager, RenderClient {
 		$this->root_template = $template;
 		$this->resolver = $resolver;
 
-		$this->tpl_parent_map = new SplObjectStorage();
+		$this->tpl_state_map = new SplObjectStorage();
 
 		// TODO: make using a tree optional once we can detect if
 		// there is any out of order rendering, or always use the tree
@@ -65,6 +67,10 @@ class Renderer implements RenderManager, RenderClient {
 			$this->rendertree->render();
 
 		return ob_get_clean();
+	}
+
+	protected function tpl_state(Templates\Base $tpl): RendererTemplateState {
+		return $this->tpl_state_map[$tpl] ??= new RendererTemplateState();
 	}
 
 	protected function initialize_tree(): void {
@@ -164,8 +170,8 @@ class Renderer implements RenderManager, RenderClient {
 	}
 
 	public function setParentForTemplate(Templates\Base $tpl, string $parent_template): void {
-		if (isset($this->tpl_parent_map[$tpl]))
-			throw new Exceptions\RendererException("invalid state: 'tpl' already has an associated parent");
-		$this->tpl_parent_map[$tpl] = $this->resolver->resolve($parent_template);
+		if (isset($this->tpl_state($tpl)->parent))
+			throw new Exceptions\RendererException("invalid state: template already has an associated parent");
+		$this->tpl_state($tpl)->parent = $this->resolver->resolve($parent_template);
 	}
 }
