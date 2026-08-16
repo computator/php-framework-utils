@@ -13,16 +13,16 @@ class Node implements IteratorAggregate {
 	protected NodeLinkedList $children;
 	protected ?Renderable $value = null;
 
-	public static function withValue(?Renderable $value): self {
-		$n = new self();
+	public static function withValue(?Renderable $value): static {
+		$n = new static();
 		$n->value = $value;
 		return $n;
 	}
 
-	public static function withChildren(self ...$children): self {
+	public static function withChildren(self ...$children): static {
 		if (!count($children))
 			throw new ArgumentCountError("at least one parameter is required");
-		$n = new self();
+		$n = new static();
 		$n->transform();
 		array_walk($children, fn ($c) => $n->children->push($c));
 		return $n;

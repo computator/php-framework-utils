@@ -2,6 +2,7 @@
 
 namespace Computator\FrameworkUtils\Test\PHPTemplate\RenderTree;
 
+use Computator\FrameworkUtils\PHPTemplate\RenderTree\IgnoredNode;
 use Computator\FrameworkUtils\PHPTemplate\RenderTree\Node;
 use Computator\FrameworkUtils\PHPTemplate\RenderTree\Renderable;
 use Computator\FrameworkUtils\PHPTemplate\RenderTree\Tree;
@@ -27,16 +28,27 @@ final class TreeTest extends TestCase {
 		return $n;
 	}
 
-	private function mockLeafNode() {
-		$n = $this->createMock(Node::class);
+	private function stubIgnoredTreeNodeWithChildren(Node ...$children) {
+		$n = $this->createStub(IgnoredNode::class);
+		$n
+			->method('isLeaf')
+			->willReturn(false);
+		$n
+			->method('getIterator')
+			->willReturn(new ArrayIterator($children));
+		return $n;
+	}
+
+	private function mockLeafNode(string $nodeclass = Node::class) {
+		$n = $this->createMock($nodeclass);
 		$n
 			->method('isLeaf')
 			->willReturn(true);
 		return $n;
 	}
 
-	private function mockLeafNodeExpectingGetValue(InvocationOrder $order, ?Renderable $value = null) {
-		$n = $this->mockLeafNode();
+	private function mockLeafNodeExpectingGetValue(InvocationOrder $order, ?Renderable $value = null, string $nodeclass = Node::class) {
+		$n = $this->mockLeafNode($nodeclass);
 		$n
 			->expects($order)
 			->method('getValue')
@@ -548,6 +560,43 @@ final class TreeTest extends TestCase {
 		asdf7
 		asdf8
 		asdf9
+		asdf10
+		asdf11
+		:
+		END
+		);
+		$tree->render();
+	}
+
+	public function testRenderSkipsIgnoredNodes(): void {
+		$tree = new Tree($this->stubTreeNodeWithChildren(
+			$this->stubTreeNodeWithChildren(
+				$this->mockLeafNodeExpectingGetValue($this->once(), $this->stubRenderableValue("asdf1\n")),
+				$this->mockLeafNodeExpectingGetValue($this->once(), $this->stubRenderableValue("asdf2\n")),
+				$this->mockLeafNodeExpectingGetValue($this->once(), $this->stubRenderableValue("asdf3\n")),
+			),
+			$this->mockLeafNodeExpectingGetValue($this->once(), $this->stubRenderableValue("asdf4\n")),
+			$this->stubTreeNodeWithChildren(
+				$this->mockLeafNodeExpectingGetValue($this->once(), $this->stubRenderableValue("asdf5\n")),
+				$this->mockLeafNodeExpectingGetValue($this->never(), $this->stubRenderableValue("never"), nodeclass: IgnoredNode::class),
+				$this->mockLeafNodeExpectingGetValue($this->once(), $this->stubRenderableValue("asdf6\n")),
+				$this->stubIgnoredTreeNodeWithChildren(
+					$this->mockLeafNodeExpectingGetValue($this->never(), $this->stubRenderableValue("never")),
+					$this->mockLeafNodeExpectingGetValue($this->never(), $this->stubRenderableValue("never")),
+				),
+				$this->mockLeafNodeExpectingGetValue($this->once(), null),
+				$this->mockLeafNodeExpectingGetValue($this->once(), $this->stubRenderableValue("asdf10\n")),
+			),
+			$this->mockLeafNodeExpectingGetValue($this->once(), $this->stubRenderableValue("asdf11\n")),
+			$this->mockLeafNodeExpectingGetValue($this->once(), $this->stubRenderableValue(":")),
+		));
+		$this->expectOutputString(<<<"END"
+		asdf1
+		asdf2
+		asdf3
+		asdf4
+		asdf5
+		asdf6
 		asdf10
 		asdf11
 		:

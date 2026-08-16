@@ -96,8 +96,9 @@ class Tree {
 	}
 
 	public function render(): void {
-		static::walk($this->root, fn ($n) =>
-			($n->isLeaf() && $n->getValue()?->render()) || true
+		static::walk($this->root,
+			fn ($n) => ($n->isLeaf() && $n->getValue()?->render()) || true,
+			fn ($n) => !($n instanceof IgnoredNode),
 		);
 	}
 }
