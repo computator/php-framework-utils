@@ -21,7 +21,7 @@ final class TemplateRuntimeControllerTest extends TestCase {
 		);
 	}
 
-	public function testTplWithValidTemplateReturnsTemplateRenderProxy(): void {
+	public function testTplSuccessReturnsTemplateRenderProxy(): void {
 		$p = $this->createStub(TemplateRenderProxy::class);
 		$r = $this->createMock(RenderManager::class);
 		$r
@@ -36,7 +36,7 @@ final class TemplateRuntimeControllerTest extends TestCase {
 		$this->assertSame($p, $rv);
 	}
 
-	public function testTplWithInvalidTemplateReturnsError(): void {
+	public function testTplFailureReturnsError(): void {
 		$e = new Exceptions\TemplateNotFoundException();
 		$r = $this->createMock(RenderManager::class);
 		$r
@@ -52,7 +52,7 @@ final class TemplateRuntimeControllerTest extends TestCase {
 		$this->assertSame($e, $rv->exception);
 	}
 
-	public function testInheritSetsParent(): void {
+	public function testInheritSuccess(): void {
 		$r = $this->createMock(RenderManager::class);
 		$t = $this->createMock(Templates\Base::class);
 		$r
@@ -65,28 +65,18 @@ final class TemplateRuntimeControllerTest extends TestCase {
 		))->inherit('test_tpl');
 	}
 
-	public function testMultipleInheritCallsThrow(): void {
+	public function testInheritFailure(): void {
 		$r = $this->createMock(RenderManager::class);
 		$t = $this->createMock(Templates\Base::class);
 		$r
-			->expects($this->exactly(2))
+			->expects($this->once())
 			->method('setParentForTemplate')
-			->willReturnCallback(function ($t_arg, $n_arg) use (&$t) {
-				static $call = 1;
-				$this->assertSame($t, $t_arg);
-				if ($call++ == 1) {
-					$this->assertSame('test_tpl', $n_arg);
-				} else {
-					$this->assertSame('test_tpl2', $n_arg);
-					throw new Exceptions\RendererException();
-				}
-			});
-		$c = new TemplateRuntimeController(
+			->with($t, 'test_tpl')
+			->willThrowException(new Exceptions\RendererException());
+		$this->expectException(Exceptions\TemplateRenderException::class);
+		(new TemplateRuntimeController(
 			$r,
 			$t,
-		);
-		$c->inherit('test_tpl');
-		$this->expectException(Exceptions\TemplateRenderException::class);
-		$c->inherit('test_tpl2');
+		))->inherit('test_tpl');
 	}
 }
