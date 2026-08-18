@@ -47,7 +47,7 @@ final class RendererStatesTest extends TestCase {
 					"zxcv",
 				]
 			),
-			json_encode(Tree::map_structure($r->rendertree->root)),
+			json_encode(Tree::map_structure_values($r->rendertree->root)),
 		);
 
 		$this->expectOutputString('asdfqwerzxcv');
@@ -88,7 +88,7 @@ final class RendererStatesTest extends TestCase {
 					"zxcv",
 				]
 			),
-			json_encode(Tree::map_structure($r->rendertree->root)),
+			json_encode(Tree::map_structure_values($r->rendertree->root)),
 		);
 
 		$this->expectOutputString('asdfAqwerBzxcv');

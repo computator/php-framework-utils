@@ -5,6 +5,8 @@ namespace Computator\FrameworkUtils\PHPTemplate\RenderTree;
 use WeakMap;
 use ValueError;
 
+use function get_class;
+
 class Tree {
 	public readonly Node $root;
 	protected Node $current_node;
@@ -33,10 +35,24 @@ class Tree {
 	}
 
 	/** @return array<array|Renderable|Null>|Renderable|null */
-	public static function map_structure(Node $start): array|Renderable|null {
+	public static function map_structure_values(Node $start): array|Renderable|null {
 		if ($start->isLeaf())
 			return $start->getValue();
-		return array_map(static::map_structure(...), [...$start]);
+		return array_map(static::map_structure_values(...), [...$start]);
+	}
+
+	/** @return array<array|string>|string */
+	public static function map_structure_types(Node $start): array|string {
+		if ($start->isLeaf())
+			return get_class($start);
+		return array_map(
+			fn ($n) => [
+				get_class($n) => $n->isLeaf()
+					? (($v = $n->getValue()) ? get_class($v) : null)
+					: static::map_structure_types($n),
+			],
+			[...$start],
+		);
 	}
 
 	public function __construct(Node $root_node) {

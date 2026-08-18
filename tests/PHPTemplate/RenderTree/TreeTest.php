@@ -185,7 +185,7 @@ final class TreeTest extends TestCase {
 		);
 	}
 
-	public function testMapStructureMatchesStucture(): void {
+	public function testMapStructureValuesMatchesStuctureData(): void {
 		$tree = $this->stubTreeNodeWithChildren(
 			$this->stubTreeNodeWithChildren(
 				$this->mockLeafNodeExpectingGetValue($this->once(), $v1 = $this->createStub(Renderable::class)),
@@ -226,7 +226,52 @@ final class TreeTest extends TestCase {
 				],
 				$v11,
 			],
-			Tree::map_structure($tree),
+			Tree::map_structure_values($tree),
+		);
+	}
+
+	public function testMapStructureTypesMatchesStuctureClasses(): void {
+		$tree = $this->stubTreeNodeWithChildren(
+			$this->stubTreeNodeWithChildren(
+				$this->mockLeafNodeExpectingGetValue($this->once(), $this->createStub(Renderable::class)),
+				$this->mockLeafNodeExpectingGetValue($this->once(), $this->createStub(Renderable::class)),
+				$this->mockLeafNodeExpectingGetValue($this->once(), $this->createStub(Renderable::class)),
+			),
+			$this->mockLeafNodeExpectingGetValue($this->once(), $this->createStub(Renderable::class)),
+			$this->stubTreeNodeWithChildren(
+				$this->mockLeafNodeExpectingGetValue($this->once(), $this->createStub(Renderable::class)),
+				$this->mockLeafNodeExpectingGetValue($this->once(), $this->createStub(Renderable::class)),
+				$this->stubTreeNodeWithChildren(
+					$this->mockLeafNodeExpectingGetValue($this->once(), $this->createStub(Renderable::class)),
+					$this->mockLeafNodeExpectingGetValue($this->once(), $this->createStub(Renderable::class)),
+					$this->mockLeafNodeExpectingGetValue($this->once(), $this->createStub(Renderable::class)),
+				),
+				$this->mockLeafNodeExpectingGetValue($this->once(), $this->createStub(Renderable::class)),
+			),
+			$this->mockLeafNodeExpectingGetValue($this->once(), $this->createStub(Renderable::class)),
+		);
+
+		$this->assertSame(
+			[
+				[Node::class => [
+					[Node::class => 'Renderable'],
+					[Node::class => 'Renderable'],
+					[Node::class => 'Renderable'],
+				]],
+				[Node::class => 'Renderable'],
+				[Node::class => [
+					[Node::class => 'Renderable'],
+					[Node::class => 'Renderable'],
+					[Node::class => [
+						[Node::class => 'Renderable'],
+						[Node::class => 'Renderable'],
+						[Node::class => 'Renderable'],
+					]],
+					[Node::class => 'Renderable'],
+				]],
+				[Node::class => 'Renderable'],
+			],
+			TestUtils\TreeUtils::map_tree_struct_parents(Tree::map_structure_types($tree)),
 		);
 	}
 
