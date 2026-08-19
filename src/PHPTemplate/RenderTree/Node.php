@@ -58,7 +58,7 @@ class Node implements IteratorAggregate {
 		assert(!isset($this->children));
 		$this->children = new NodeLinkedListImpl();
 		if ($this->value !== null) {
-			$this->children->push(self::withValue($this->value));
+			$this->children->push(Node::withValue($this->value));
 			$this->value = null;
 		}
 	}

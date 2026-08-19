@@ -2,6 +2,7 @@
 
 namespace Computator\FrameworkUtils\Test\PHPTemplate\RenderTree;
 
+use Computator\FrameworkUtils\PHPTemplate\RenderTree\IgnoredNode;
 use Computator\FrameworkUtils\PHPTemplate\RenderTree\Node;
 use Computator\FrameworkUtils\PHPTemplate\RenderTree\Renderable;
 use Iterator;
@@ -132,6 +133,15 @@ final class NodeTest extends TestCase {
 			$this->createStub(Node::class),
 		);
 		$this->assertCount(4, $n);
+	}
+
+	public function testAppendChildrenWithParentSubclassWithValue(): void {
+		$n = IgnoredNode::withValue($this->createStub(Renderable::class));
+		$n->appendChildren($this->createStub(Node::class));
+		foreach ($n as $c) {
+			$this->assertInstanceOf(Node::class, $c);
+			$this->assertNotInstanceOf(IgnoredNode::class, $c);
+		}
 	}
 
 	public function testPopChildWithSingleChild(): void {

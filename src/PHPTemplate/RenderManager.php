@@ -14,4 +14,8 @@ interface RenderManager {
 	public function renderError(Templates\PHPString|Templates\Text|string $error): void;
 
 	public function setParentForTemplate(Templates\Base $tpl, string $parent_template): void;
+
+	public function startRenderingBlock(Templates\Base $tpl, string $block_name): void;
+
+	public function endRenderingBlock(Templates\Base $tpl): void;
 }

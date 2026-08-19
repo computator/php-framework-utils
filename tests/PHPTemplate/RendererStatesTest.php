@@ -4,6 +4,9 @@ namespace Computator\FrameworkUtils\Test\PHPTemplate;
 
 use Computator\FrameworkUtils\PHPTemplate\RenderManager;
 use Computator\FrameworkUtils\PHPTemplate\Renderer;
+use Computator\FrameworkUtils\PHPTemplate\RenderTree\Buffer;
+use Computator\FrameworkUtils\PHPTemplate\RenderTree\IgnoredNode;
+use Computator\FrameworkUtils\PHPTemplate\RenderTree\Node;
 use Computator\FrameworkUtils\PHPTemplate\RenderTree\Tree;
 use Computator\FrameworkUtils\PHPTemplate\Templates;
 use Computator\FrameworkUtils\Test\PHPTemplate\TestUtils;
@@ -25,7 +28,7 @@ final class RendererStatesTest extends TestCase {
 		return $t;
 	}
 
-	public function testSequenceOfChildren(): void {
+	public function testRenderChildSequenceOfChildren(): void {
 		/** @var RenderManager|TestUtils\VisibleRenderer $r */
 		$r = TestUtils\VisibleRenderer::create($this->createStub(Templates\Base::class),
 			new TestUtils\QueueTemplateResolver(
@@ -54,7 +57,7 @@ final class RendererStatesTest extends TestCase {
 		$r->rendertree->render();
 	}
 
-	public function testNestedChild(): void {
+	public function testRenderChildNestedChild(): void {
 		/** @var RenderManager|TestUtils\VisibleRenderer $r */
 		$r = TestUtils\VisibleRenderer::create(
 			$this->stubTemplate('root'),
@@ -92,6 +95,132 @@ final class RendererStatesTest extends TestCase {
 		);
 
 		$this->expectOutputString('asdfAqwerBzxcv');
+		$r->rendertree->render();
+	}
+
+	public function testStartRenderingBlockStructure(): void {
+		/** @var RenderManager|TestUtils\VisibleRenderer $r */
+		$r = TestUtils\VisibleRenderer::create(
+			$t = $this->stubTemplate(''),
+			new TestUtils\QueueTemplateResolver(
+				$this->stubTemplate('parent'),
+			),
+		);
+
+		$r->setParentForTemplate($t, 'parent_tpl');
+		$r->swap_to_new_buffer();
+		$r->startRenderingBlock($t, 'testblock');
+		ob_end_clean();
+
+		$this->assertSame(
+			[
+				[Node::class => Buffer::class],
+				[IgnoredNode::class => Buffer::class],
+			],
+			Tree::map_structure_types($r->rendertree->root),
+		);
+
+		$this->assertJsonStringEqualsJsonString(
+			json_encode(
+				[
+					'',
+					'',
+				]
+			),
+			json_encode(Tree::map_structure_values($r->rendertree->root)),
+		);
+
+		$this->assertSame($r->rendertree->root->getIterator()[1], $r->rendertree->getCurrentNode());
+	}
+
+	public function testEndRenderingBlockStructure(): void {
+		/** @var RenderManager|TestUtils\VisibleRenderer $r */
+		$r = TestUtils\VisibleRenderer::create(
+			$t = $this->stubTemplate(''),
+			new TestUtils\QueueTemplateResolver(
+				$this->stubTemplate('parent'),
+			),
+		);
+
+		$r->setParentForTemplate($t, 'parent_tpl');
+		$r->swap_to_new_buffer();
+		$r->startRenderingBlock($t, 'testblock');
+		$r->endRenderingBlock($t);
+		ob_end_clean();
+
+		$this->assertSame(
+			[
+				[Node::class => Buffer::class],
+				[IgnoredNode::class => Buffer::class],
+				[Node::class => Buffer::class],
+			],
+			Tree::map_structure_types($r->rendertree->root),
+		);
+
+		$this->assertJsonStringEqualsJsonString(
+			json_encode(
+				[
+					'',
+					'',
+					'',
+				]
+			),
+			json_encode(Tree::map_structure_values($r->rendertree->root)),
+		);
+
+		$this->assertSame($r->rendertree->root, $r->rendertree->getCurrentNode());
+	}
+
+	public function testRenderingBlocksUseIgnoredNodeTree(): void {
+		/** @var RenderManager|TestUtils\VisibleRenderer $r */
+		$r = TestUtils\VisibleRenderer::create(
+			$t = $this->stubTemplate(''),
+			new TestUtils\QueueTemplateResolver(
+				$this->stubTemplate('parent'),
+				$this->stubTemplate('child'),
+			),
+		);
+
+		$r->setParentForTemplate($t, 'parent_tpl');
+		$r->swap_to_new_buffer();
+		$r->startRenderingBlock($t, 'testblock');
+		$r->renderChild($r->getTemplateAsProxy('child_tpl'));
+		$r->endRenderingBlock($t);
+		$r->complete_buffer();
+
+		$this->assertSame(
+			[
+				[Node::class => Buffer::class],
+				[IgnoredNode::class => [
+					[Node::class => Buffer::class],
+					[Node::class => [
+						[Node::class => Buffer::class],
+					]],
+					[Node::class => Buffer::class],
+				]],
+				[Node::class => Buffer::class],
+			],
+			Tree::map_structure_types($r->rendertree->root),
+		);
+
+		$this->assertJsonStringEqualsJsonString(
+			json_encode(
+				[
+					'',
+					[
+						'',
+						[
+							'child',
+						],
+						'',
+					],
+					'',
+				]
+			),
+			json_encode(Tree::map_structure_values($r->rendertree->root)),
+		);
+
+		$this->expectOutputString('');
 		$r->rendertree->render();
 	}
 }

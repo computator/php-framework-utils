@@ -6,8 +6,10 @@ use Computator\FrameworkUtils\PHPTemplate\Exceptions;
 use Computator\FrameworkUtils\PHPTemplate\RenderManager;
 use Computator\FrameworkUtils\PHPTemplate\RenderObjects\TemplateRenderProxy;
 use Computator\FrameworkUtils\PHPTemplate\Renderer;
+use Computator\FrameworkUtils\PHPTemplate\RenderTree;
 use Computator\FrameworkUtils\PHPTemplate\Templates;
 use Computator\FrameworkUtils\Test\PHPTemplate\TestUtils;
+use Computator\FrameworkUtils\Test\PHPTemplate\TestUtils\VisibleRenderer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\TestCase;
@@ -15,6 +17,7 @@ use PHPUnit\Framework\TestCase;
 use Exception;
 use ReflectionProperty;
 
+use ValueError;
 use function ob_start;
 
 #[CoversClass(Renderer::class)]
@@ -206,4 +209,80 @@ final class RendererTest extends TestCase {
 		$this->expectException(Exceptions\RendererException::class);
 		$r->setParentForTemplate($t, 'asdf');
 	}
+
+	public function testStartRenderingBlockWithEmptyNameThrows(): void {
+		/** @var RenderManager $r */
+		$r = Renderer::create($this->createStub(Templates\Base::class));
+		$t = $this->createStub(Templates\Base::class);
+		$this->expectException(ValueError::class);
+		$r->startRenderingBlock($t, '');
+	}
+
+	public function testStartRenderingBlockWithNoParentThrows(): void {
+		/** @var RenderManager|VisibleRenderer $r */
+		$r = VisibleRenderer::create($this->createStub(Templates\Base::class));
+		$t = $this->createStub(Templates\Base::class);
+		$this->expectException(Exceptions\RendererStateException::class);
+		$r->startRenderingBlock($t, 'asdf');
+	}
+
+	public function testStartRenderingBlockWithOpenBlockThrows(): void {
+		/** @var RenderManager|VisibleRenderer $r */
+		$r = VisibleRenderer::create($this->createStub(Templates\Base::class));
+		$t = $this->createStub(Templates\Base::class);
+		$r->tpl_state($t)->parent = $this->createStub(Templates\Base::class);
+		$r->swap_to_new_buffer();
+		$r->startRenderingBlock($t, 'asdf');
+		ob_end_clean();
+		$this->expectException(Exceptions\RendererStateException::class);
+		$r->startRenderingBlock($t, 'qwer');
+	}
+
+	public function testStartRenderingBlockWithDuplicateNameThrows(): void {
+		/** @var RenderManager|VisibleRenderer $r */
+		$r = VisibleRenderer::create($this->createStub(Templates\Base::class));
+		$t = $this->createStub(Templates\Base::class);
+		$r->tpl_state($t)->parent = $this->createStub(Templates\Base::class);
+		$r->tpl_state($t)->blocks['asdf'] = $this->createStub(RenderTree\Node::class);
+		$this->expectException(Exceptions\RendererStateException::class);
+		$r->startRenderingBlock($t, 'asdf');
+	}
+
+	public function testStartRenderingBlockSuccess(): void {
+		/** @var RenderManager|VisibleRenderer $r */
+		$r = VisibleRenderer::create($this->createStub(Templates\Base::class));
+		$t = $this->createStub(Templates\Base::class);
+		$r->tpl_state($t)->parent = $this->createStub(Templates\Base::class);
+		$r->swap_to_new_buffer();
+		$r->startRenderingBlock($t, 'asdf');
+		ob_end_clean();
+		$this->assertSame('asdf', $r->tpl_state($t)->current_block);
+		$this->assertArrayHasKey('asdf', $r->tpl_state($t)->blocks);
+		$this->assertSame($r->tpl_state($t)->blocks['asdf'], $r->rendertree->getCurrentNode());
+	}
+
+	public function testEndRenderingBlockWithoutOpenBlockThrows(): void {
+		/** @var RenderManager|VisibleRenderer $r */
+		$r = VisibleRenderer::create($this->createStub(Templates\Base::class));
+		$t = $this->createStub(Templates\Base::class);
+		$this->expectException(Exceptions\RendererStateException::class);
+		$r->endRenderingBlock($t);
+	}
+
+	public function testEndRenderingBlockSuccess(): void {
+		/** @var RenderManager|VisibleRenderer $r */
+		$r = VisibleRenderer::create($this->createStub(Templates\Base::class));
+		$t = $this->createStub(Templates\Base::class);
+		$r->tpl_state($t)->parent = $this->createStub(Templates\Base::class);
+		$before = $r->rendertree->getCurrentNode();
+		$r->swap_to_new_buffer();
+		$r->startRenderingBlock($t, 'asdf');
+		$r->endRenderingBlock($t);
+		ob_end_clean();
+		$this->assertNull($r->tpl_state($t)->current_block);
+		$this->assertArrayHasKey('asdf', $r->tpl_state($t)->blocks);
+		$this->assertNotSame($before, $r->tpl_state($t)->blocks['asdf']);
+		$this->assertSame($before, $r->rendertree->getCurrentNode());
+	}
+
 }

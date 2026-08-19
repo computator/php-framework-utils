@@ -9,6 +9,7 @@ use Computator\FrameworkUtils\PHPTemplate\Templates;
 use ArrayAccess;
 use SplObjectStorage;
 use Throwable;
+use ValueError;
 
 use function array_key_exists;
 use function is_string;
@@ -179,5 +180,48 @@ class Renderer implements RenderManager, RenderClient {
 		if (isset($this->tpl_state($tpl)->parent))
 			throw new Exceptions\RendererStateException("template already has an associated parent");
 		$this->tpl_state($tpl)->parent = $this->resolver->resolve($parent_template);
+	}
+
+	public function startRenderingBlock(Templates\Base $tpl, string $block_name): void {
+		if ($block_name == '')
+			throw new ValueError("'\$block_name' can not be empty");
+		if ($this->tpl_state($tpl)->parent === null)
+			throw new Exceptions\RendererStateException("can not define a block until a parent template has been set");
+		if ($this->tpl_state($tpl)->current_block !== null)
+			throw new Exceptions\RendererStateException("current block '{$this->tpl_state($tpl)->current_block}' has not been closed");
+		if (isset($this->tpl_state($tpl)->blocks[$block_name]))
+			throw new Exceptions\RendererStateException("can not redefine block '{$block_name}' for template");
+
+		// swap to new IgnoredNode for block
+		assert($this->tpl_state($tpl)->current_block_prev_node === null);
+		$this->tpl_state($tpl)->current_block_prev_node = $this->rendertree->getCurrentNode();
+		$node = $this->rendertree->addNode(RenderTree\IgnoredNode::withValue(null));
+		$this->rendertree->setCurrentNode($node);
+
+		// store current block
+		$this->tpl_state($tpl)->blocks[$block_name] = $node;
+		$this->tpl_state($tpl)->current_block = $block_name;
+
+		// swap to buffer in new node
+		$was_buffering = $this->swap_to_new_buffer();
+		assert($was_buffering == true);
+	}
+
+	public function endRenderingBlock(Templates\Base $tpl): void {
+		if ($this->tpl_state($tpl)->current_block === null)
+			throw new Exceptions\RendererStateException("not currently rendering a block");
+
+		// complete buffer for block
+		$this->complete_buffer();
+
+		// swap back to the node active before the block
+		assert($this->tpl_state($tpl)->current_block_prev_node !== null);
+		$this->rendertree->setCurrentNode($this->tpl_state($tpl)->current_block_prev_node);
+		$this->tpl_state($tpl)->current_block_prev_node = null;
+
+		// swap to buffer in original node
+		$this->swap_to_new_buffer();
+
+		$this->tpl_state($tpl)->current_block = null;
 	}
 }
