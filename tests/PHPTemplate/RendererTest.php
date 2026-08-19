@@ -146,7 +146,7 @@ final class RendererTest extends TestCase {
 		$this->assertNull($p);
 	}
 
-	public function testRenderChild(): void {
+	public function testRenderChildIsolated(): void {
 		/** @var RenderManager|TestUtils\VisibleRenderer $r */
 		$r = TestUtils\VisibleRenderer::create($this->createStub(Templates\Base::class),
 			new TestUtils\QueueTemplateResolver(
@@ -165,6 +165,35 @@ final class RendererTest extends TestCase {
 		$r->renderChild($p);
 		$this->expectOutputString('asdf');
 		$r->rendertree->render();
+	}
+
+	public function testRenderChildWhileRendering(): void {
+		/** @var RenderManager|TestUtils\VisibleRenderer $r */
+		$r = TestUtils\VisibleRenderer::create(
+			$tp = $this->createStub(Templates\Base::class),
+			new TestUtils\QueueTemplateResolver(
+				$tc = $this->createStub(Templates\Base::class),
+			),
+		);
+
+		$p = $r->getTemplateAsProxy('test_tpl');
+		$this->assertSame($tc, (new ReflectionProperty(TemplateRenderProxy::class, 'tpl'))->getValue($p));
+
+		$tp
+			->method('execute')
+			->willReturnCallback(function (...$args) use (&$p): void {
+				echo 'asdf';
+				$args['renderer']->renderChild($p);
+				echo 'qwer';
+			});
+		$tc
+			->method('execute')
+			->willReturnCallback(function (...$args): void {
+				echo 'zxcv';
+			});
+
+		$this->expectOutputString('asdfzxcvqwer');
+		$r->render();
 	}
 
 	public function testRenderErrorWithStringTemplate(): void {

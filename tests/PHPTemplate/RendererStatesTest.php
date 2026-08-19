@@ -3,19 +3,18 @@
 namespace Computator\FrameworkUtils\Test\PHPTemplate;
 
 use Computator\FrameworkUtils\PHPTemplate\RenderManager;
-use Computator\FrameworkUtils\PHPTemplate\Renderer;
 use Computator\FrameworkUtils\PHPTemplate\RenderTree\Buffer;
 use Computator\FrameworkUtils\PHPTemplate\RenderTree\IgnoredNode;
 use Computator\FrameworkUtils\PHPTemplate\RenderTree\Node;
 use Computator\FrameworkUtils\PHPTemplate\RenderTree\Tree;
 use Computator\FrameworkUtils\PHPTemplate\Templates;
 use Computator\FrameworkUtils\Test\PHPTemplate\TestUtils;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
 use function is_string;
 
-#[CoversClass(Renderer::class)]
+#[CoversNothing]
 final class RendererStatesTest extends TestCase {
 	private function stubTemplate(Callable|string $content): Templates\Base {
 		$cb = !is_string($content) ? $content : function (...$args) use ($content): void {
