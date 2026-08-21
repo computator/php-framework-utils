@@ -7,6 +7,7 @@ use Computator\FrameworkUtils\PHPTemplate\Templates;
 
 class RendererTemplateState {
 	public ?Templates\Base $parent = null;
+	public ?Templates\Base $curr_child = null;
 	/** @var array<RenderTree\Node> $blocks */
 	public array $blocks = [];
 	public ?string $current_block = null;

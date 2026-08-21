@@ -26,18 +26,79 @@ final class RendererTest extends TestCase {
 	use TestUtils\StubTemplate;
 
 	public function testRender(): void {
-		$t = $this->stubTemplate('asdf');
-		$r = Renderer::create($t);
+		$r = Renderer::create(
+			$this->stubTemplate('asdf'),
+		);
+		$this->expectOutputString('asdf');
+		$r->render();
+	}
+
+	public function testRenderWithInherit(): void {
+		$r = Renderer::create(
+			$this->stubTemplate(function (...$args) {
+				['renderer' => $tr, 'template' => $tt] = $args;
+				$tr->setParentForTemplate($tt, 'test_parent');
+				$tr->startRenderingBlock($tt, 'block');
+				echo 'qwer';
+				$tr->endRenderingBlock($tt);
+			}),
+			new TestUtils\QueueTemplateResolver(
+				$this->stubTemplate('asdf'),
+			),
+		);
 		$this->expectOutputString('asdf');
 		$r->render();
 	}
 
 	public function testRenderToString(): void {
-		$t = $this->stubTemplate('asdf');
-		$r = Renderer::create($t);
+		$r = Renderer::create(
+			$this->stubTemplate('asdf'),
+		);
 		$this->expectOutputString('');
 		$rv = $r->renderToString();
 		$this->assertSame('asdf', $rv);
+	}
+
+	public function testRenderToStringWithInherit(): void {
+		$r = Renderer::create(
+			$this->stubTemplate(function (...$args) {
+				['renderer' => $tr, 'template' => $tt] = $args;
+				$tr->setParentForTemplate($tt, 'test_parent');
+				$tr->startRenderingBlock($tt, 'block');
+				echo 'qwer';
+				$tr->endRenderingBlock($tt);
+			}),
+			new TestUtils\QueueTemplateResolver(
+				$this->stubTemplate('asdf'),
+			),
+		);
+		$this->expectOutputString('');
+		$rv = $r->renderToString();
+		$this->assertSame('asdf', $rv);
+	}
+
+	public function testRenderWithMultiInherit(): void {
+		$r = Renderer::create(
+			$this->stubTemplate(function (...$args) {
+				['renderer' => $tr, 'template' => $tt] = $args;
+				$tr->setParentForTemplate($tt, 'test_parent');
+				$tr->startRenderingBlock($tt, 'block');
+				echo 'qwer';
+				$tr->endRenderingBlock($tt);
+			}),
+			new TestUtils\QueueTemplateResolver(
+				$this->stubTemplate(function (...$args) {
+					['renderer' => $tr, 'template' => $tt] = $args;
+					$tr->setParentForTemplate($tt, 'test_parent2');
+					$tr->startRenderingBlock($tt, 'block');
+					echo 'zxcv';
+					$tr->endRenderingBlock($tt);
+				}),
+				$this->stubTemplate('asdf'),
+			),
+		);
+		$this->expectOutputString('asdf');
+		$r->render();
 	}
 
 	public function testRenderTemplateWithError(): void {
@@ -171,6 +232,29 @@ final class RendererTest extends TestCase {
 
 		$this->expectOutputString('asdfzxcvqwer');
 		$r->render();
+	}
+
+	public function testRenderChildWithInherit(): void {
+		/** @var RenderManager|TestUtils\VisibleRenderer $r */
+		$r = TestUtils\VisibleRenderer::create(
+			$this->createStub(Templates\Base::class),
+			new TestUtils\QueueTemplateResolver(
+				$this->stubTemplate(function (...$args) {
+					['renderer' => $tr, 'template' => $tt] = $args;
+					$tr->setParentForTemplate($tt, 'test_parent');
+					$tr->startRenderingBlock($tt, 'block');
+					echo 'qwer';
+					$tr->endRenderingBlock($tt);
+				}),
+				$this->stubTemplate('asdf'),
+			),
+		);
+
+		$proxy = $r->getTemplateAsProxy('test_tpl');
+
+		$r->renderChild($proxy);
+		$this->expectOutputString('asdf');
+		$r->rendertree->render();
 	}
 
 	public function testRenderErrorWithStringTemplate(): void {

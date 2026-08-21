@@ -51,7 +51,7 @@ class Renderer implements RenderManager, RenderClient {
 		// use try-finally since we want to send output as well
 		// as throw any errors
 		try {
-			$this->do_render($this->root_template);
+			$this->render_with_inherit($this->root_template);
 		} finally {
 			if ($this->using_tree)
 				$this->rendertree->render();
@@ -63,7 +63,7 @@ class Renderer implements RenderManager, RenderClient {
 
 		ob_start();
 
-		$this->do_render($this->root_template);
+		$this->render_with_inherit($this->root_template);
 		if ($this->using_tree)
 			$this->rendertree->render();
 
@@ -136,6 +136,29 @@ class Renderer implements RenderManager, RenderClient {
 			throw $error;
 	}
 
+	protected function render_parent(Templates\Base $child_tpl): void	{
+		$parent_tpl = $this->tpl_state($child_tpl)->parent;
+		assert($parent_tpl !== null);
+		assert($this->tpl_state($parent_tpl)->curr_child === null);
+
+		try {
+			$this->tpl_state($parent_tpl)->curr_child = $child_tpl;
+			$this->do_render($parent_tpl);
+		} finally {
+			$this->tpl_state($parent_tpl)->curr_child = null;
+		}
+
+		// if the parent has it's own parent, render that
+		if ($this->tpl_state($parent_tpl)->parent !== null)
+			$this->render_parent($parent_tpl);
+	}
+
+	protected function render_with_inherit(Templates\Base $tpl): void {
+		$this->do_render($tpl);
+		if ($this->tpl_state($tpl)->parent !== null)
+			$this->render_parent($tpl);
+	}
+
 	public function getTemplateAsProxy(string $template): RenderObjects\TemplateRenderProxy {
 		$tpl = $this->resolver->resolve($template);
 		$proxy = new RenderObjects\TemplateRenderProxy(
@@ -161,7 +184,7 @@ class Renderer implements RenderManager, RenderClient {
 		$prev = $this->rendertree->getCurrentNode();
 		$new_node = $this->rendertree->addNode();
 		$this->rendertree->setCurrentNode($new_node);
-		$this->do_render($this->tpl_proxy_map[$proxy->id]);
+		$this->render_with_inherit($this->tpl_proxy_map[$proxy->id]);
 		$this->rendertree->setCurrentNode($prev);
 		// if rendering is nested the final buffer node
 		// needs to be shifted back to the parent node
