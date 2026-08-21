@@ -2,11 +2,13 @@
 
 namespace Computator\FrameworkUtils\PHPTemplate;
 
+use Computator\FrameworkUtils\PHPTemplate\RenderObjects;
 use Computator\FrameworkUtils\PHPTemplate\Exceptions;
+use Computator\FrameworkUtils\PHPTemplate\Templates\TemplateClient;
 
 use ReflectionMethod;
 
-class TemplateRuntimeController {
+class TemplateRuntimeController implements TemplateClient {
 
 	public static function getConstructorTestArgs(\PHPUnit\Framework\TestCase $tc): array {
 		$tc_createStub = new ReflectionMethod($tc::class, 'createStub');
