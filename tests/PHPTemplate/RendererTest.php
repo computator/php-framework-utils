@@ -23,7 +23,7 @@ use function ob_start;
 #[CoversClass(Renderer::class)]
 final class RendererTest extends TestCase {
 
-	use TestUtils\StubTemplate;
+	use TestUtils\TreeStubs;
 
 	public function testRender(): void {
 		$r = Renderer::create(

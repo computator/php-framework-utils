@@ -8,7 +8,6 @@ use Computator\FrameworkUtils\PHPTemplate\RenderTree\Renderable;
 use Computator\FrameworkUtils\PHPTemplate\RenderTree\Tree;
 use Computator\FrameworkUtils\Test\PHPTemplate\TestUtils;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\Rule\InvocationOrder;
 use PHPUnit\Framework\TestCase;
 
 use ArrayIterator;
@@ -17,52 +16,7 @@ use ValueError;
 #[CoversClass(Tree::class)]
 final class TreeTest extends TestCase {
 
-	private function stubTreeNodeWithChildren(Node ...$children) {
-		$n = $this->createStub(Node::class);
-		$n
-			->method('isLeaf')
-			->willReturn(false);
-		$n
-			->method('getIterator')
-			->willReturn(new ArrayIterator($children));
-		return $n;
-	}
-
-	private function stubIgnoredTreeNodeWithChildren(Node ...$children) {
-		$n = $this->createStub(IgnoredNode::class);
-		$n
-			->method('isLeaf')
-			->willReturn(false);
-		$n
-			->method('getIterator')
-			->willReturn(new ArrayIterator($children));
-		return $n;
-	}
-
-	private function mockLeafNode(string $nodeclass = Node::class) {
-		$n = $this->createMock($nodeclass);
-		$n
-			->method('isLeaf')
-			->willReturn(true);
-		return $n;
-	}
-
-	private function mockLeafNodeExpectingGetValue(InvocationOrder $order, ?Renderable $value = null, string $nodeclass = Node::class) {
-		$n = $this->mockLeafNode($nodeclass);
-		$n
-			->expects($order)
-			->method('getValue')
-			->willReturn($value);
-		return $n;
-	}
-
-	private function stubRenderableValue(String $value) {
-		$n = $this->createStub(Renderable::class);
-		$n
-			->method('render')
-			->willReturnCallback(fn (): bool => (bool) print $value);
-		return $n;
-	}
+	use TestUtils\TreeStubs;
 
 	public function testWalkVisitsAllNodes(): void {
 		$tree = $this->stubTreeNodeWithChildren(

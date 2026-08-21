@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversNothing]
 final class RendererStatesTest extends TestCase {
 
-	use TestUtils\StubTemplate;
+	use TestUtils\TreeStubs;
 
 	public function testRenderChildSequenceOfChildren(): void {
 		/** @var RenderManager|TestUtils\VisibleRenderer $r */
