@@ -25,8 +25,6 @@ class Tree {
 			return false;
 		if (!$start->isLeaf()) {
 			foreach ($start as $n) {
-				if ($filter && !$filter($start))
-					continue;
 				if (static::walk($n, $callback, $filter) === false)
 					return false;
 			}

@@ -185,6 +185,34 @@ final class TreeTest extends TestCase {
 		);
 	}
 
+	public function testWalkFilterSkipsLeaves(): void {
+		$tree = $this->stubTreeNodeWithChildren(
+			$this->stubTreeNodeWithChildren(
+				$this->mockLeafNodeExpectingGetValue($this->once()),
+				$this->mockLeafNodeExpectingGetValue($this->once()),
+				$this->mockLeafNodeExpectingGetValue($this->once()),
+			),
+			$this->mockLeafNodeExpectingGetValue($this->once()),
+			$this->stubTreeNodeWithChildren(
+				$this->mockLeafNodeExpectingGetValue($this->once()),
+				$this->mockLeafNodeExpectingGetValue($this->once()),
+				$this->stubTreeNodeWithChildren(
+					$this->mockLeafNodeExpectingGetValue($this->once()),
+					$n1 = $this->mockLeafNodeExpectingGetValue($this->never()),
+					$n2 = $this->mockLeafNodeExpectingGetValue($this->never()),
+					$this->mockLeafNodeExpectingGetValue($this->once()),
+				),
+				$this->mockLeafNodeExpectingGetValue($this->once()),
+			),
+			$this->mockLeafNodeExpectingGetValue($this->once()),
+		);
+
+		Tree::walk($tree,
+			fn (Node $n) => $n->isLeaf() ? $n->getValue() === null : true,
+			fn (Node $n) => $n !== $n1 && $n !== $n2,
+		);
+	}
+
 	public function testMapStructureValuesMatchesStuctureData(): void {
 		$tree = $this->stubTreeNodeWithChildren(
 			$this->stubTreeNodeWithChildren(
