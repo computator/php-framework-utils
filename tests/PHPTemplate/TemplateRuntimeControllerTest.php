@@ -180,4 +180,65 @@ final class TemplateRuntimeControllerTest extends TestCase {
 			$t,
 		))->define_end();
 	}
+
+	public function testBlockSuccessExisting(): void {
+		$r = $this->createMock(RenderManager::class);
+		$t = $this->createMock(Templates\Base::class);
+		$r
+			->expects($this->once())
+			->method('renderChildBlock')
+			->with($t, 'test_block')
+			->willReturn(true);
+		$rv = (new TemplateRuntimeController(
+			$r,
+			$t,
+		))->block('test_block');
+		$this->assertTrue($rv);
+	}
+
+	public function testBlockSuccessMissing(): void {
+		$r = $this->createMock(RenderManager::class);
+		$t = $this->createMock(Templates\Base::class);
+		$r
+			->expects($this->once())
+			->method('renderChildBlock')
+			->with($t, 'test_block')
+			->willReturn(false);
+		$rv = (new TemplateRuntimeController(
+			$r,
+			$t,
+		))->block('test_block');
+		$this->assertFalse($rv);
+	}
+
+	public function testBlockInvalidState(): void {
+		$r = $this->createMock(RenderManager::class);
+		$t = $this->createMock(Templates\Base::class);
+		$r
+			->expects($this->once())
+			->method('renderChildBlock')
+			->with($t, 'test_block')
+			->willThrowException(new Exceptions\RendererStateException());
+		$this->expectException(Exceptions\TemplateLogicException::class);
+		(new TemplateRuntimeController(
+			$r,
+			$t,
+		))->block('test_block');
+	}
+
+	public function testBlockFailure(): void {
+		$r = $this->createMock(RenderManager::class);
+		$t = $this->createMock(Templates\Base::class);
+		$r
+			->expects($this->once())
+			->method('renderChildBlock')
+			->with($t, 'test_block')
+			->willThrowException(new Exceptions\RendererException());
+		$this->expectException(Exceptions\TemplateRenderException::class);
+		(new TemplateRuntimeController(
+			$r,
+			$t,
+		))->block('test_block');
+	}
+
 }

@@ -352,8 +352,8 @@ final class RendererTest extends TestCase {
 	}
 
 	public function testEndRenderingBlockWithoutOpenBlockThrows(): void {
-		/** @var RenderManager|VisibleRenderer $r */
-		$r = VisibleRenderer::create($this->createStub(Templates\Base::class));
+		/** @var RenderManager $r */
+		$r = Renderer::create($this->createStub(Templates\Base::class));
 		$t = $this->createStub(Templates\Base::class);
 		$this->expectException(Exceptions\RendererStateException::class);
 		$r->endRenderingBlock($t);
@@ -375,4 +375,41 @@ final class RendererTest extends TestCase {
 		$this->assertSame($before, $r->rendertree->getCurrentNode());
 	}
 
+	public function testRenderChildBlockSuccess(): void {
+		/** @var RenderManager|VisibleRenderer $r */
+		$r = VisibleRenderer::create($this->createStub(Templates\Base::class));
+		$t = $this->createStub(Templates\Base::class);
+		$c = $this->createStub(Templates\Base::class);
+		$r->tpl_state($t)->curr_child = $c;
+		$r->tpl_state($c)->blocks['test_block'] = $this->mockLeafNodeExpectingGetValue(
+			$this->once(),
+			$this->stubRenderableValue('block_val'),
+		);
+		$r->swap_to_new_buffer();
+		$found = $r->renderChildBlock($t, 'test_block');
+		ob_end_clean();
+		$this->assertTrue($found);
+		$this->expectOutputString('block_val');
+		$r->rendertree->render();
+	}
+
+	public function testRenderChildBlockWithoutChildThrows(): void {
+		/** @var RenderManager $r */
+		$r = Renderer::create($this->createStub(Templates\Base::class));
+		$t = $this->createStub(Templates\Base::class);
+		$this->expectException(Exceptions\RendererStateException::class);
+		$r->renderChildBlock($t, 'test_block');
+	}
+
+	public function testRenderChildBlockWithMissingBlockReturnsFalse(): void {
+		/** @var RenderManager|VisibleRenderer $r */
+		$r = VisibleRenderer::create($this->createStub(Templates\Base::class));
+		$t = $this->createStub(Templates\Base::class);
+		$c = $this->createStub(Templates\Base::class);
+		$r->tpl_state($t)->curr_child = $c;
+		$found = $r->renderChildBlock($t, 'test_block');
+		$this->assertFalse($found);
+		$this->expectOutputString('');
+		$r->rendertree->render();
+	}
 }

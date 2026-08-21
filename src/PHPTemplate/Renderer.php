@@ -247,4 +247,18 @@ class Renderer implements RenderManager, RenderClient {
 
 		$this->tpl_state($tpl)->current_block = null;
 	}
+
+	public function renderChildBlock(Templates\Base $tpl, string $block_name): bool {
+		if (!isset($this->tpl_state($tpl)->curr_child))
+			throw new Exceptions\RendererStateException("template does not have a child set");
+		$child_tpl = $this->tpl_state($tpl)->curr_child;
+		if (!array_key_exists($block_name, $this->tpl_state($child_tpl)->blocks))
+			return false;
+		$this->complete_buffer();
+		$this->rendertree->addNode(
+			RenderTree\Node::fromNode($this->tpl_state($child_tpl)->blocks[$block_name]),
+		);
+		$this->swap_to_new_buffer();
+		return true;
+	}
 }

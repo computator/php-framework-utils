@@ -58,4 +58,14 @@ class TemplateRuntimeController {
 			throw new Exceptions\TemplateRenderException("renderer error: $e", previous: $e);
 		}
 	}
+
+	public function block(string $block_name): bool {
+		try {
+			return $this->renderer->renderChildBlock($this->template, $block_name);
+		} catch (Exceptions\RendererStateException $e) {
+			throw new Exceptions\TemplateLogicException("only parent templates can render child template blocks: $e", previous: $e);
+		} catch (Exceptions\RendererException $e) {
+			throw new Exceptions\TemplateRenderException("renderer error: $e", previous: $e);
+		}
+	}
 }

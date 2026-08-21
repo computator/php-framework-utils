@@ -18,4 +18,6 @@ interface RenderManager {
 	public function startRenderingBlock(Templates\Base $tpl, string $block_name): void;
 
 	public function endRenderingBlock(Templates\Base $tpl): void;
+
+	public function renderChildBlock(Templates\Base $tpl, string $block_name): bool;
 }
