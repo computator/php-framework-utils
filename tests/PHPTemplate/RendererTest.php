@@ -197,7 +197,7 @@ final class RendererTest extends TestCase {
 		$this->assertNull($p);
 	}
 
-	public function testRenderChildIsolated(): void {
+	public function testRenderProxiedTemplateIsolated(): void {
 		/** @var RenderManager|TestUtils\VisibleRenderer $r */
 		$r = TestUtils\VisibleRenderer::create($this->createStub(Templates\Base::class),
 			new TestUtils\QueueTemplateResolver(
@@ -208,18 +208,18 @@ final class RendererTest extends TestCase {
 		$p = $r->getTemplateAsProxy('test_tpl');
 		$this->assertSame($t, (new ReflectionProperty(TemplateRenderProxy::class, 'tpl'))->getValue($p));
 
-		$r->renderChild($p);
+		$r->renderProxiedTemplate($p);
 		$this->expectOutputString('asdf');
 		$r->rendertree->render();
 	}
 
-	public function testRenderChildWhileRendering(): void {
+	public function testRenderProxiedTemplateWhileRendering(): void {
 		$p = null;
 		/** @var RenderManager|TestUtils\VisibleRenderer $r */
 		$r = TestUtils\VisibleRenderer::create(
 			$tp = $this->stubTemplate(function (...$args) use (&$p): void {
 				echo 'asdf';
-				$args['renderer']->renderChild($p);
+				$args['renderer']->renderProxiedTemplate($p);
 				echo 'qwer';
 			}),
 			new TestUtils\QueueTemplateResolver(
@@ -234,7 +234,7 @@ final class RendererTest extends TestCase {
 		$r->render();
 	}
 
-	public function testRenderChildWithInherit(): void {
+	public function testRenderProxiedTemplateWithInherit(): void {
 		/** @var RenderManager|TestUtils\VisibleRenderer $r */
 		$r = TestUtils\VisibleRenderer::create(
 			$this->createStub(Templates\Base::class),
@@ -252,7 +252,7 @@ final class RendererTest extends TestCase {
 
 		$proxy = $r->getTemplateAsProxy('test_tpl');
 
-		$r->renderChild($proxy);
+		$r->renderProxiedTemplate($proxy);
 		$this->expectOutputString('asdf');
 		$r->rendertree->render();
 	}

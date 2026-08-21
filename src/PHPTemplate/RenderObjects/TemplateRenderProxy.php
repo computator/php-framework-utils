@@ -16,6 +16,6 @@ class TemplateRenderProxy {
 	}
 
 	public function __invoke(): void {
-		$this->renderer->renderChild($this);
+		$this->renderer->renderProxiedTemplate($this);
 	}
 }

@@ -31,7 +31,7 @@ final class TemplateRenderProxyTest extends TestCase {
 
 		$r
 			->expects($this->once())
-			->method('renderChild')
+			->method('renderProxiedTemplate')
 			->with($proxy);
 
 		$proxy();

@@ -180,7 +180,7 @@ class Renderer implements RenderManager, RenderClient {
 		return $proxy;
 	}
 
-	public function renderChild(RenderObjects\TemplateRenderProxy $proxy): void {
+	public function renderProxiedTemplate(RenderObjects\TemplateRenderProxy $proxy): void {
 		$prev = $this->rendertree->getCurrentNode();
 		$new_node = $this->rendertree->addNode();
 		$this->rendertree->setCurrentNode($new_node);

@@ -17,7 +17,7 @@ final class RendererStatesTest extends TestCase {
 
 	use TestUtils\TreeStubs;
 
-	public function testRenderChildSequenceOfChildren(): void {
+	public function testRenderProxiedTemplateSequenceOfTemplates(): void {
 		/** @var RenderManager|TestUtils\VisibleRenderer $r */
 		$r = TestUtils\VisibleRenderer::create($this->createStub(Templates\Base::class),
 			new TestUtils\QueueTemplateResolver(
@@ -27,9 +27,9 @@ final class RendererStatesTest extends TestCase {
 			),
 		);
 
-		$r->renderChild($r->getTemplateAsProxy('test_tpl'));
-		$r->renderChild($r->getTemplateAsProxy('test_tpl'));
-		$r->renderChild($r->getTemplateAsProxy('test_tpl'));
+		$r->renderProxiedTemplate($r->getTemplateAsProxy('test_tpl'));
+		$r->renderProxiedTemplate($r->getTemplateAsProxy('test_tpl'));
+		$r->renderProxiedTemplate($r->getTemplateAsProxy('test_tpl'));
 
 		$this->assertJsonStringEqualsJsonString(
 			json_encode(
@@ -46,7 +46,7 @@ final class RendererStatesTest extends TestCase {
 		$r->rendertree->render();
 	}
 
-	public function testRenderChildNestedChild(): void {
+	public function testRenderProxiedTemplateNestedTemplates(): void {
 		/** @var RenderManager|TestUtils\VisibleRenderer $r */
 		$r = TestUtils\VisibleRenderer::create(
 			$this->stubTemplate('root'),
@@ -54,7 +54,7 @@ final class RendererStatesTest extends TestCase {
 				$this->stubTemplate('asdf'),
 				$this->stubTemplate(function (...$n) {
 					echo "A";
-					$n['renderer']->renderChild($n['renderer']->getTemplateAsProxy('test_tpl'));
+					$n['renderer']->renderProxiedTemplate($n['renderer']->getTemplateAsProxy('test_tpl'));
 					echo "B";
 				}),
 				$this->stubTemplate('qwer'),
@@ -62,9 +62,9 @@ final class RendererStatesTest extends TestCase {
 			),
 		);
 
-		$r->renderChild($r->getTemplateAsProxy('test_tpl')); // asdf
-		$r->renderChild($r->getTemplateAsProxy('test_tpl')); // A + qwer + B
-		$r->renderChild($r->getTemplateAsProxy('test_tpl')); // zxcv
+		$r->renderProxiedTemplate($r->getTemplateAsProxy('test_tpl')); // asdf
+		$r->renderProxiedTemplate($r->getTemplateAsProxy('test_tpl')); // A + qwer + B
+		$r->renderProxiedTemplate($r->getTemplateAsProxy('test_tpl')); // zxcv
 
 		$this->assertJsonStringEqualsJsonString(
 			json_encode(
@@ -173,7 +173,7 @@ final class RendererStatesTest extends TestCase {
 		$r->setParentForTemplate($t, 'parent_tpl');
 		$r->swap_to_new_buffer();
 		$r->startRenderingBlock($t, 'testblock');
-		$r->renderChild($r->getTemplateAsProxy('child_tpl'));
+		$r->renderProxiedTemplate($r->getTemplateAsProxy('child_tpl'));
 		$r->endRenderingBlock($t);
 		$r->complete_buffer();
 
