@@ -22,25 +22,18 @@ use function ob_start;
 
 #[CoversClass(Renderer::class)]
 final class RendererTest extends TestCase {
+
+	use TestUtils\StubTemplate;
+
 	public function testRender(): void {
-		$t = $this->createStub(Templates\Base::class);
-		$t
-			->method('execute')
-			->willReturnCallback(function (...$args): void {
-				echo 'asdf';
-			});
+		$t = $this->stubTemplate('asdf');
 		$r = Renderer::create($t);
 		$this->expectOutputString('asdf');
 		$r->render();
 	}
 
 	public function testRenderToString(): void {
-		$t = $this->createStub(Templates\Base::class);
-		$t
-			->method('execute')
-			->willReturnCallback(function (...$args): void {
-				echo 'asdf';
-			});
+		$t = $this->stubTemplate('asdf');
 		$r = Renderer::create($t);
 		$this->expectOutputString('');
 		$rv = $r->renderToString();
@@ -59,14 +52,11 @@ final class RendererTest extends TestCase {
 	}
 
 	public function testRenderTemplateWithMismatchedOutputBuffering(): void {
-		$t = $this->createStub(Templates\Base::class);
-		$t
-			->method('execute')
-			->willReturnCallback(function (...$args): void {
-				echo 'asdf';
-				ob_start();
-				echo 'qwer';
-			});
+		$t = $this->stubTemplate(function (...$args): void {
+			echo 'asdf';
+			ob_start();
+			echo 'qwer';
+		});
 		$r = Renderer::create($t);
 		$this->expectOutputString('asdfqwer');
 		$this->expectException(Exceptions\TemplateRenderException::class);
@@ -150,14 +140,9 @@ final class RendererTest extends TestCase {
 		/** @var RenderManager|TestUtils\VisibleRenderer $r */
 		$r = TestUtils\VisibleRenderer::create($this->createStub(Templates\Base::class),
 			new TestUtils\QueueTemplateResolver(
-				$t = $this->createStub(Templates\Base::class),
+				$t = $this->stubTemplate('asdf'),
 			),
 		);
-		$t
-			->method('execute')
-			->willReturnCallback(function (...$args): void {
-				echo 'asdf';
-			});
 
 		$p = $r->getTemplateAsProxy('test_tpl');
 		$this->assertSame($t, (new ReflectionProperty(TemplateRenderProxy::class, 'tpl'))->getValue($p));
@@ -168,29 +153,21 @@ final class RendererTest extends TestCase {
 	}
 
 	public function testRenderChildWhileRendering(): void {
+		$p = null;
 		/** @var RenderManager|TestUtils\VisibleRenderer $r */
 		$r = TestUtils\VisibleRenderer::create(
-			$tp = $this->createStub(Templates\Base::class),
+			$tp = $this->stubTemplate(function (...$args) use (&$p): void {
+				echo 'asdf';
+				$args['renderer']->renderChild($p);
+				echo 'qwer';
+			}),
 			new TestUtils\QueueTemplateResolver(
-				$tc = $this->createStub(Templates\Base::class),
+				$tc = $this->stubTemplate('zxcv'),
 			),
 		);
 
 		$p = $r->getTemplateAsProxy('test_tpl');
 		$this->assertSame($tc, (new ReflectionProperty(TemplateRenderProxy::class, 'tpl'))->getValue($p));
-
-		$tp
-			->method('execute')
-			->willReturnCallback(function (...$args) use (&$p): void {
-				echo 'asdf';
-				$args['renderer']->renderChild($p);
-				echo 'qwer';
-			});
-		$tc
-			->method('execute')
-			->willReturnCallback(function (...$args): void {
-				echo 'zxcv';
-			});
 
 		$this->expectOutputString('asdfzxcvqwer');
 		$r->render();

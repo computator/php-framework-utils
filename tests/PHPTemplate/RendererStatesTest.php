@@ -12,20 +12,10 @@ use Computator\FrameworkUtils\Test\PHPTemplate\TestUtils;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
-use function is_string;
-
 #[CoversNothing]
 final class RendererStatesTest extends TestCase {
-	private function stubTemplate(Callable|string $content): Templates\Base {
-		$cb = !is_string($content) ? $content : function (...$args) use ($content): void {
-			echo $content;
-		};
-		$t = $this->createStub(Templates\Base::class);
-		$t
-			->method('execute')
-			->willReturnCallback($cb);
-		return $t;
-	}
+
+	use TestUtils\StubTemplate;
 
 	public function testRenderChildSequenceOfChildren(): void {
 		/** @var RenderManager|TestUtils\VisibleRenderer $r */
