@@ -28,6 +28,13 @@ class Node implements IteratorAggregate {
 		return $n;
 	}
 
+	public static function fromNode(self $node): self {
+		if ($node->isLeaf())
+			return self::withValue($node->getValue());
+		else
+			return self::withChildren(...$node);
+	}
+
 	private function __construct() {}
 
 	public function getIterator(): Iterator {

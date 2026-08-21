@@ -34,6 +34,21 @@ final class NodeTest extends TestCase {
 		Node::withChildren();
 	}
 
+	public function testFromNodeWithLeafNode(): void {
+		$v = $this->createStub(Renderable::class);
+		$n = Node::fromNode(Node::withValue($v));
+		$this->assertTrue($n->isLeaf());
+		$this->assertSame($v, $n->getValue());
+	}
+
+	public function testFromNodeWithTreeNode(): void {
+		$c1 = $this->createStub(Node::class);
+		$c2 = $this->createStub(Node::class);
+		$n = Node::fromNode(Node::withChildren($c1, $c2));
+		$this->assertFalse($n->isLeaf());
+		$this->assertSame([$c1, $c2], [...$n]);
+	}
+
 	public function testIsLeafWithNullValue(): void {
 		$n = Node::withValue(null);
 		$this->assertTrue($n->isLeaf());
