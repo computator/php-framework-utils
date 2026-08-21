@@ -51,6 +51,29 @@
 	EXPECTED,
 ],
 
+'minimal inheritance' => [
+	<<<'INPUT'
+	<? self::inherit('base_tpl') ?>
+	<? self::define('block1') ?>
+		main block
+		:
+	<? self::define_end() ?>
+	INPUT,
+	[
+		'base_tpl' => <<<'DEP'
+		base beforeblock
+		<? self::block('block1') ?>
+		base after
+		DEP,
+	],
+	<<<'EXPECTED'
+	base beforeblock
+		main block
+		:
+	base after
+	EXPECTED,
+],
+
 /* TODO: implement
 'base template' => [
 	<<<'INPUT'
