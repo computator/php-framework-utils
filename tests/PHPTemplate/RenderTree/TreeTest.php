@@ -275,6 +275,21 @@ final class TreeTest extends TestCase {
 		);
 	}
 
+	public function testMapStructureTypesWithLeafStart(): void {
+		$this->assertSame(
+			[
+				[Node::class => 'Renderable'],
+			],
+			TestUtils\TreeUtils::map_tree_struct_parents(
+				[
+					Tree::map_structure_types(
+						$this->mockLeafNodeExpectingGetValue($this->once(), $this->createStub(Renderable::class)),
+					),
+				],
+			),
+		);
+	}
+
 	public function testIsEmptyWithLeaf(): void {
 		$n = $this->createMock(Node::class);
 		$n

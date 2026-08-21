@@ -44,7 +44,7 @@ class Tree {
 	/** @return array<array|string>|string */
 	public static function map_structure_types(Node $start): array|string {
 		if ($start->isLeaf())
-			return get_class($start);
+			return [get_class($start) => (($v = $start->getValue()) ? get_class($v) : null)];
 		return array_map(
 			fn ($n) => [
 				get_class($n) => $n->isLeaf()
